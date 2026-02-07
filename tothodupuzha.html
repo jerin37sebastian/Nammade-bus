@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Thodupuzha - Schedule</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+        
+        /* BACKGROUND ANIMATION */
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        .container { width: 95%; max-width: 500px; text-align: center; padding: 40px 20px; margin: 0 auto; position: relative; z-index: 1; }
+        
+        /* AD BOX */
+        .ad-box-wrapper { 
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+            border-radius: 25px; padding: 15px; margin-bottom: 25px; 
+            border: 1.5px solid rgba(41, 121, 255, 0.3); text-align: left;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .ad-icon { width: 50px; height: 50px; background: #2979ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.2rem; flex-shrink: 0; }
+        .ad-tag { font-size: 0.6rem; font-weight: 800; color: #2979ff; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 2px; }
+        .ad-title { font-weight: 800; color: #0d47a1; font-size: 0.95rem; }
+        .ad-desc { font-size: 0.75rem; color: #5f6368; line-height: 1.2; }
+
+        /* MAIN CARD */
+        .next-bus-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); border-radius: 40px; padding: 40px 25px; border: 1px solid rgba(41, 121, 255, 0.2); box-shadow: 0 15px 35px rgba(41, 121, 255, 0.1); margin-bottom: 30px; }
+        .label { color: #2979ff; text-transform: uppercase; letter-spacing: 3px; font-size: 0.7rem; font-weight: 800; margin-bottom: 15px; display: block; }
+        .arrival-time { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 10px; color: #0d47a1; }
+        #bus-countdown { font-size: 1.2rem; font-weight: 800; color: #00c853; }
+        
+        /* SEARCH & LIST STYLING */
+        #search-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #e3f2fd; margin-bottom: 15px; outline: none; font-family: 'Inter'; font-weight: 600; }
+        #toggle-btn { background: #e3f2fd; border: 1px solid rgba(41, 121, 255, 0.2); color: #1976d2; padding: 15px 35px; border-radius: 25px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-bottom: 20px; width: 100%; }
+        #full-list-container { display: none; margin-top: 10px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; border: 1px solid rgba(41, 121, 255, 0.1); margin-bottom: 100px; }
+        .list-row { display: flex; justify-content: space-between; padding: 18px 25px; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
+        .highlight-row { background: #2979ff !important; border-radius: 20px; color: white; transform: scale(1.02); }
+
+        /* FLOATING SEARCH ICON */
+        .search-fab {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; background: #2979ff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(41, 121, 255, 0.4); border: none; cursor: pointer; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <header style="margin-bottom: 30px;">
+            <a href="index.html" style="color: #2979ff; text-decoration: none; font-size: 0.8rem; font-weight: 700;">← CHANGE TRIP</a>
+            <h2 id="route-header" style="font-weight: 800; margin-top: 10px; color: #0d47a1;">TO THODUPUZHA</h2>
+            <div style="font-size: 0.85rem; margin-top: 5px; color: #5f6368; font-weight: 600;">Current Stop: <span id="loc-name">--</span></div>
+        </header>
+
+        <div class="ad-box-wrapper">
+            <div class="ad-icon" id="ad-icon">NB</div>
+            <div>
+                <span class="ad-tag" id="ad-tag-label">Partner Shop</span>
+                <div class="ad-title" id="ad-title">Loading...</div>
+                <div class="ad-desc" id="ad-desc">Checking for nearby offers.</div>
+            </div>
+        </div>
+
+        <div class="next-bus-card">
+            <span class="label" id="status-label">Next Bus Arriving</span>
+            <div id="bus-name" style="font-size:1.3rem; margin-bottom:5px; color: #1a1a1a; font-weight: 700;">--</div>
+            <div id="bus-time" class="arrival-time">--:--</div>
+            <div id="bus-countdown">Locating...</div>
+        </div>
+
+        <button id="toggle-btn" onclick="toggleList()">View Full Schedule</button>
+
+        <div id="full-list-container">
+            <input type="text" id="search-input" placeholder="Search bus name..." onkeyup="filterList()">
+            <div id="list-items"></div>
+        </div>
+    </div>
+
+    <button class="search-fab" onclick="toggleList()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+
+    <script>
+        // 1. PARTICLES ANIMATION
+        const canvas = document.getElementById('particleCanvas'); const ctx = canvas.getContext('2d'); let particles = [];
+        function init() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particles = []; for(let i=0; i<70; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*3+1, sp: Math.random()*0.5+0.1, o: Math.random()*0.3+0.1}); }
+        function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p => { p.y -= p.sp; if(p.y<0) p.y=canvas.height; ctx.fillStyle = `rgba(41, 121, 255, ${p.o})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
+        window.onresize = init; init(); draw();
+
+        // 2. BUS DATA - BASE TIMINGS AT INCHIKATT KAVALA
+        const inchikattKavalaData = [
+            ["5:50", "NOAH", "AM"],
+            ["6:15", "MARIYA", "AM"],
+            ["6:20", "MARIYA", "AM"],
+            ["6:35", "NOAH", "AM"],
+            ["6:45", "MARIYA", "AM"],
+            ["7:05", "LMS", "AM"],
+            ["7:20", "MARIYA", "AM"],
+            ["7:30", "THACHUPARMBIL", "AM"],
+            ["7:40", "NIBRAS", "AM"],
+            ["7:55", "MARIYA", "AM"],
+            ["8:05", "SULTHANA", "AM"],
+            ["8:21", "NOAH", "AM"],
+            ["8:35", "NOAH", "AM"],
+            ["8:49", "MARIYA", "AM"],
+            ["9:05", "MARIYA", "AM"],
+            ["9:22", "MARIYA", "AM"],
+            ["9:35", "NIBRAS", "AM"],
+            ["9:41", "MARIYA", "AM"],
+            ["9:57", "MARIYA", "AM"],
+            ["10:24", "NOAH", "AM"],
+            ["10:40", "NOAH", "AM"],
+            ["10:56", "MARIYA", "AM"],
+            ["11:32", "NIBRAS", "AM"],
+            ["11:40", "MARIYA", "AM"],
+            ["11:49", "MARIYA", "AM"],
+            ["11:57", "MARIYA", "AM"],
+            ["12:15", "MARIYA", "PM"],
+            ["12:30", "SULTHANA", "PM"],
+            ["12:55", "NOAH", "PM"],
+            ["1:05", "NOAH", "PM"],
+            ["1:30", "MARIYA", "PM"],
+            ["1:44", "MARIYA", "PM"],
+            ["1:54", "MARIYA", "PM"],
+            ["2:20", "NIBRAS", "PM"],
+            ["2:34", "MARIYA", "PM"],
+            ["2:41", "MARIYA", "PM"],
+            ["2:50", "NOAH", "PM"],
+            ["3:13", "MARIYA", "PM"],
+            ["3:25", "MARIYA", "PM"],
+            ["3:35", "NOAH", "PM"],
+            ["3:54", "MARIYA", "PM"],
+            ["4:21", "NIBRAS", "PM"],
+            ["4:35", "MARIYA", "PM"],
+            ["4:45", "NOAH", "PM"],
+            ["4:53", "MARIYA", "PM"],
+            ["5:05", "MARIYA", "PM"],
+            ["5:20", "SULTHANA", "PM"],
+            ["5:36", "NOAH", "PM"],
+            ["5:52", "MARIYA", "PM"],
+            ["6:05", "MARIYA", "PM"]
+        ];
+        
+        // Offsets FROM Inchikatt Kavala (in minutes)
+        const offsets = { 
+            "Poomala": -2,
+            "Inchikatt Kavala": 0, 
+            "Pannimattom": 1, 
+            "Elamdhesham": 4, 
+            "Kalayanthani": 11, 
+            "Alacode": 16, 
+            "Edavetty": 25, 
+            "Kumbamkallu": 29, 
+            "Thodupuzha Stand": 33 
+        };
+
+        const stop = localStorage.getItem('selectedStopName') || "Inchikatt Kavala";
+        document.getElementById('loc-name').innerText = stop;
+
+        // 3. ADS
+        const ads = {
+            "Poomala": { n: "Poomala Heights", d: "The best view and coffee at the top.", i: "PH" },
+            "Thodupuzha Stand": { n: "Metro Textiles", d: "Festival sale now live!", i: "MT" },
+            "Inchikatt Kavala": { n: "Kavala Store", d: "Fresh groceries daily.", i: "KS" }
+        };
+        const currentAd = ads[stop] || { n: "Local Business", d: "Grow your reach with Nammade Bus.", i: "NB" };
+        document.getElementById('ad-title').innerText = currentAd.n;
+        document.getElementById('ad-desc').innerText = currentAd.d;
+        document.getElementById('ad-icon').innerText = currentAd.i;
+
+        // 4. CORE LOGIC
+        function updateUI() {
+            const label = document.getElementById('status-label');
+            if (stop.toLowerCase().includes("stand") || stop === "Poomala") {
+                label.innerText = "Bus will Departure at";
+            } else {
+                label.innerText = "Next Bus Arriving";
+            }
+
+            const now = new Date(); const currentMins = now.getHours() * 60 + now.getMinutes();
+            let nextBusIndex = -1; let listHTML = "";
+            const stopOffset = offsets[stop] || 0;
+
+            inchikattKavalaData.forEach((bus, index) => {
+                let [t, n, p] = bus; 
+                let [h, m] = t.split(':').map(Number);
+                
+                // Convert base time (Inchikatt Kavala) to minutes
+                let baseTotal = (h % 12) * 60 + m + (p === "PM" && h !== 12 ? 720 : 0);
+                if(p === "AM" && h === 12) baseTotal = m;
+                
+                // Add offset for current stop
+                let total = baseTotal + stopOffset;
+                
+                if (nextBusIndex === -1 && total > currentMins) nextBusIndex = index;
+
+                let nh = Math.floor(total / 60) % 24; 
+                let nm = Math.round(total % 60);
+                let timeStr = `${nh % 12 || 12}:${nm.toString().padStart(2,'0')} ${nh >= 12 ? 'PM' : 'AM'}`;
+                
+                if (index === nextBusIndex) {
+                    document.getElementById('bus-name').innerText = n;
+                    document.getElementById('bus-time').innerText = timeStr;
+                    document.getElementById('bus-countdown').innerText = `In ${Math.floor(total - currentMins)} mins`;
+                }
+                listHTML += `<div class="list-row ${index === nextBusIndex ? 'highlight-row' : ''}"><span>${timeStr}</span><span>${n}</span></div>`;
+            });
+            document.getElementById('list-items').innerHTML = listHTML;
+        }
+
+        function toggleList() {
+            const container = document.getElementById('full-list-container');
+            const btn = document.getElementById('toggle-btn');
+            if (container.style.display === "block") {
+                container.style.display = "none"; btn.innerText = "View Full Schedule";
+            } else {
+                container.style.display = "block"; 
+                btn.innerText = "Hide Schedule";
+                document.getElementById('search-input').focus();
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }
+
+        function filterList() {
+            let input = document.getElementById('search-input').value.toUpperCase();
+            let rows = document.getElementsByClassName('list-row');
+            for (let i = 0; i < rows.length; i++) {
+                let txt = rows[i].innerText;
+                rows[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+            }
+        }
+
+        updateUI();
+        setInterval(updateUI, 30000);
+    </script>
+</body>
+</html>
