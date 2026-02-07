@@ -44,6 +44,11 @@
             width: 60px; height: 60px; background: #2979ff;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 10px 25px rgba(41, 121, 255, 0.4); border: none; cursor: pointer; z-index: 100;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .search-fab.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
     </style>
 </head>
@@ -54,7 +59,7 @@
         <header style="margin-bottom: 30px;">
             <a href="index.html" style="color: #2979ff; text-decoration: none; font-size: 0.8rem; font-weight: 700;">← CHANGE TRIP</a>
             <h2 id="route-header" style="font-weight: 800; margin-top: 10px; color: #0d47a1;">TO THODUPUZHA</h2>
-            <div style="font-size: 0.85rem; margin-top: 5px; color: #5f6368; font-weight: 600;">Current Stop: <span id="loc-name">--</span></div>
+            <div style="font-size: 0.85rem; margin-top: 5px; color: #5f6368; font-weight: 600;">From: <span id="loc-name">--</span></div>
         </header>
 
         <div class="ad-box-wrapper">
@@ -81,7 +86,7 @@
         </div>
     </div>
 
-    <button class="search-fab" onclick="toggleList()">
+    <button class="search-fab" id="search-fab" onclick="toggleList()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
 
@@ -101,7 +106,7 @@
             ["6:45", "MARIYA", "AM"],
             ["7:05", "LMS", "AM"],
             ["7:20", "MARIYA", "AM"],
-            ["7:30", "THACHUPARMBIL", "AM"],
+            ["7:30", "THACHUPARA", "AM"],
             ["7:40", "NIBRAS", "AM"],
             ["7:55", "MARIYA", "AM"],
             ["8:05", "SULTHANA", "AM"],
@@ -160,6 +165,10 @@
         };
 
         const stop = localStorage.getItem('selectedStopName') || "Inchikatt Kavala";
+        const destination = localStorage.getItem('userDestination') || "Thodupuzha Stand";
+        
+        // Update header with dynamic destination and from location
+        document.getElementById('route-header').innerText = `TO ${destination.toUpperCase()}`;
         document.getElementById('loc-name').innerText = stop;
 
         // 3. ADS
@@ -182,32 +191,44 @@
                 label.innerText = "Next Bus Arriving";
             }
 
-            const now = new Date(); const currentMins = now.getHours() * 60 + now.getMinutes();
-            let nextBusIndex = -1; let listHTML = "";
+            const now = new Date(); 
+            const currentMins = now.getHours() * 60 + now.getMinutes();
+            let nextBusIndex = -1; 
+            let nextBusTime = -1;
+            let listHTML = "";
             const stopOffset = offsets[stop] || 0;
 
             inchikattKavalaData.forEach((bus, index) => {
                 let [t, n, p] = bus; 
                 let [h, m] = t.split(':').map(Number);
                 
-                // Convert base time (Inchikatt Kavala) to minutes
-                let baseTotal = (h % 12) * 60 + m + (p === "PM" && h !== 12 ? 720 : 0);
-                if(p === "AM" && h === 12) baseTotal = m;
+                // Convert base time (Inchikatt Kavala) to minutes since midnight
+                let baseTotal = (h % 12) * 60 + m;
+                if (p === "PM" && h !== 12) baseTotal += 720; // Add 12 hours for PM
+                if (p === "AM" && h === 12) baseTotal = m; // Midnight case
                 
                 // Add offset for current stop
                 let total = baseTotal + stopOffset;
                 
-                if (nextBusIndex === -1 && total > currentMins) nextBusIndex = index;
+                // Find next bus
+                if (nextBusIndex === -1 && total > currentMins) {
+                    nextBusIndex = index;
+                    nextBusTime = total;
+                }
 
+                // Calculate display time
                 let nh = Math.floor(total / 60) % 24; 
                 let nm = Math.round(total % 60);
                 let timeStr = `${nh % 12 || 12}:${nm.toString().padStart(2,'0')} ${nh >= 12 ? 'PM' : 'AM'}`;
                 
+                // Update UI for next bus
                 if (index === nextBusIndex) {
                     document.getElementById('bus-name').innerText = n;
                     document.getElementById('bus-time').innerText = timeStr;
-                    document.getElementById('bus-countdown').innerText = `In ${Math.floor(total - currentMins)} mins`;
+                    let minsUntil = nextBusTime - currentMins;
+                    document.getElementById('bus-countdown').innerText = `In ${minsUntil} mins`;
                 }
+                
                 listHTML += `<div class="list-row ${index === nextBusIndex ? 'highlight-row' : ''}"><span>${timeStr}</span><span>${n}</span></div>`;
             });
             document.getElementById('list-items').innerHTML = listHTML;
@@ -216,11 +237,16 @@
         function toggleList() {
             const container = document.getElementById('full-list-container');
             const btn = document.getElementById('toggle-btn');
+            const fab = document.getElementById('search-fab');
+            
             if (container.style.display === "block") {
-                container.style.display = "none"; btn.innerText = "View Full Schedule";
+                container.style.display = "none"; 
+                btn.innerText = "View Full Schedule";
+                fab.classList.remove('hidden'); // Show FAB when list is closed
             } else {
                 container.style.display = "block"; 
                 btn.innerText = "Hide Schedule";
+                fab.classList.add('hidden'); // Hide FAB when list is open
                 document.getElementById('search-input').focus();
                 window.scrollTo(0, document.body.scrollHeight);
             }
