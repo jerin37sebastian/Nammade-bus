@@ -202,10 +202,21 @@
                 let [t, n, p] = bus; 
                 let [h, m] = t.split(':').map(Number);
                 
-                // Convert base time (Inchikatt Kavala) to minutes since midnight
-                let baseTotal = (h % 12) * 60 + m;
-                if (p === "PM" && h !== 12) baseTotal += 720; // Add 12 hours for PM
-                if (p === "AM" && h === 12) baseTotal = m; // Midnight case
+                // Convert to minutes since midnight - FIXED for 12 PM
+                let baseTotal;
+                if (p === "AM") {
+                    if (h === 12) {
+                        baseTotal = m; // 12:xx AM = midnight hour
+                    } else {
+                        baseTotal = h * 60 + m; // 1-11 AM
+                    }
+                } else { // PM
+                    if (h === 12) {
+                        baseTotal = 720 + m; // 12:xx PM = noon hour (720 = 12*60)
+                    } else {
+                        baseTotal = (h + 12) * 60 + m; // 1-11 PM
+                    }
+                }
                 
                 // Add offset for current stop
                 let total = baseTotal + stopOffset;
