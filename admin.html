@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Nammade Bus</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 20px; }
+        
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        h1 { color: #2979ff; margin-bottom: 10px; }
+        .subtitle { color: #5f6368; margin-bottom: 30px; font-size: 0.9rem; }
+        
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 1.2rem; font-weight: 700; color: #0d47a1; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e3f2fd; }
+        
+        .stop-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stop-item { background: #f1f3f4; padding: 12px; border-radius: 10px; font-weight: 600; }
+        
+        textarea { width: 100%; min-height: 300px; padding: 15px; border: 2px solid #e3f2fd; border-radius: 15px; font-family: 'Courier New', monospace; font-size: 0.85rem; resize: vertical; }
+        
+        .btn { background: #2979ff; color: white; padding: 15px 30px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 1rem; margin-top: 15px; }
+        .btn:hover { background: #1976d2; }
+        .btn-secondary { background: #5f6368; }
+        .btn-secondary:hover { background: #424242; }
+        
+        .info-box { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2979ff; }
+        .warning-box { background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ff9800; }
+        
+        code { background: #f1f3f4; padding: 2px 6px; border-radius: 4px; font-size: 0.9rem; }
+        
+        .example { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚌 Nammade Bus Admin Dashboard</h1>
+        <div class="subtitle">Manage bus schedules and stop information</div>
+        
+        <!-- STOPS SECTION -->
+        <div class="section">
+            <div class="section-title">📍 Current Stops (13 Total)</div>
+            <div class="stop-list">
+                <div class="stop-item">1. Poomala</div>
+                <div class="stop-item">2. Injikatt Kavala</div>
+                <div class="stop-item">3. Pannimattom</div>
+                <div class="stop-item">4. Karukapally Kavala</div>
+                <div class="stop-item">5. Elamdhesham</div>
+                <div class="stop-item">6. Elamdhesham School</div>
+                <div class="stop-item">7. Kalayanthani</div>
+                <div class="stop-item">8. Alacode</div>
+                <div class="stop-item">9. Meenmutty</div>
+                <div class="stop-item">10. Edavetty</div>
+                <div class="stop-item">11. Edavetty Jaram</div>
+                <div class="stop-item">12. Kumbakallu</div>
+                <div class="stop-item">13. Thodupuzha Stand</div>
+            </div>
+        </div>
+        
+        <!-- TO THODUPUZHA SCHEDULE -->
+        <div class="section">
+            <div class="section-title">🚌 To Thodupuzha Schedule</div>
+            <div class="info-box">
+                <strong>Base Stop:</strong> Injikatt Kavala<br>
+                <strong>Total Buses:</strong> 50<br>
+                <strong>First Bus:</strong> 5:50 AM NOAH<br>
+                <strong>Last Bus:</strong> 6:05 PM MARIYA
+            </div>
+            
+            <div class="warning-box">
+                <strong>⚠️ Instructions:</strong> Each line should be formatted as: <code>["TIME", "BUS_NAME", "AM/PM"]</code><br>
+                Example: <code>["5:50", "NOAH", "AM"]</code>
+            </div>
+            
+            <textarea id="to-thodupuzha-schedule" placeholder='Paste schedule here in format:
+["5:50", "NOAH", "AM"],
+["6:15", "MARIYA", "AM"],
+...'>["5:50", "NOAH", "AM"],
+["6:15", "MARIYA", "AM"],
+["6:20", "MARIYA", "AM"],
+["6:35", "NOAH", "AM"],
+["6:45", "MARIYA", "AM"],
+["7:05", "LMS", "AM"],
+["7:20", "MARIYA", "AM"],
+["7:30", "THACHUPARA", "AM"],
+["7:40", "NIBRAS", "AM"],
+["7:55", "MARIYA", "AM"],
+["8:05", "SULTHANA", "AM"],
+["8:21", "NOAH", "AM"],
+["8:35", "NOAH", "AM"],
+["8:49", "MARIYA", "AM"],
+["9:05", "MARIYA", "AM"],
+["9:22", "MARIYA", "AM"],
+["9:35", "NIBRAS", "AM"],
+["9:41", "MARIYA", "AM"],
+["9:57", "MARIYA", "AM"],
+["10:24", "NOAH", "AM"],
+["10:40", "NOAH", "AM"],
+["10:56", "MARIYA", "AM"],
+["11:32", "NIBRAS", "AM"],
+["11:40", "MARIYA", "AM"],
+["11:49", "MARIYA", "AM"],
+["11:57", "MARIYA", "AM"],
+["12:15", "MARIYA", "PM"],
+["12:30", "SULTHANA", "PM"],
+["12:55", "NOAH", "PM"],
+["1:05", "NOAH", "PM"],
+["1:30", "MARIYA", "PM"],
+["1:44", "MARIYA", "PM"],
+["1:54", "MARIYA", "PM"],
+["2:20", "NIBRAS", "PM"],
+["2:34", "MARIYA", "PM"],
+["2:41", "MARIYA", "PM"],
+["2:50", "NOAH", "PM"],
+["3:13", "MARIYA", "PM"],
+["3:25", "MARIYA", "PM"],
+["3:35", "NOAH", "PM"],
+["3:54", "MARIYA", "PM"],
+["4:21", "NIBRAS", "PM"],
+["4:35", "MARIYA", "PM"],
+["4:45", "NOAH", "PM"],
+["4:53", "MARIYA", "PM"],
+["5:05", "MARIYA", "PM"],
+["5:20", "SULTHANA", "PM"],
+["5:36", "NOAH", "PM"],
+["5:52", "MARIYA", "PM"],
+["6:05", "MARIYA", "PM"]</textarea>
+            
+            <button class="btn" onclick="copyToClipboard('to-thodupuzha-schedule')">📋 Copy Schedule</button>
+            <button class="btn btn-secondary" onclick="validateSchedule('to-thodupuzha-schedule')">✓ Validate Format</button>
+        </div>
+        
+        <!-- FROM THODUPUZHA SCHEDULE -->
+        <div class="section">
+            <div class="section-title">🚌 From Thodupuzha (To Poomala) Schedule</div>
+            <div class="info-box">
+                <strong>Base Stop:</strong> Injikatt Kavala<br>
+                <strong>Total Buses:</strong> 53<br>
+                <strong>First Bus:</strong> 6:46 AM MARIYA<br>
+                <strong>Last Bus:</strong> 8:28 PM SULTHANA
+            </div>
+            
+            <textarea id="from-thodupuzha-schedule" placeholder='Paste schedule here...'>["6:46", "MARIYA", "AM"],
+["6:58", "MARIYA", "AM"],
+["7:18", "MARIYA", "AM"],
+["7:28", "NOAH", "AM"],
+["7:38", "MARIYA", "AM"],
+["7:55", "MARIYA", "AM"],
+["8:19", "MARIYA", "AM"],
+["8:33", "NIBRAS", "AM"],
+["8:48", "MARIYA", "AM"],
+["9:17", "NOAH", "AM"],
+["9:29", "NOAH", "AM"],
+["9:43", "MARIYA", "AM"],
+["10:13", "MARIYA", "AM"],
+["10:29", "NIBRAS", "AM"],
+["10:35", "MARIYA", "AM"],
+["10:44", "MARIYA", "AM"],
+["10:59", "MARIYA", "AM"],
+["11:10", "SULTHANA", "AM"],
+["11:20", "NOAH", "AM"],
+["11:47", "NOAH", "AM"],
+["12:08", "MARIYA", "PM"],
+["12:18", "MARIYA", "PM"],
+["12:34", "MARIYA", "PM"],
+["12:48", "MARIYA", "PM"],
+["12:58", "NIBRAS", "PM"],
+["1:13", "MARIYA", "PM"],
+["1:26", "MARIYA", "PM"],
+["1:48", "NOAH", "PM"],
+["2:03", "MARIYA", "PM"],
+["2:28", "NOAH", "PM"],
+["2:38", "MARIYA", "PM"],
+["3:00", "MARIYA", "PM"],
+["3:13", "NIBRAS", "PM"],
+["3:28", "MARIYA", "PM"],
+["3:32", "MARIYA", "PM"],
+["3:43", "NOAH", "PM"],
+["4:09", "MARIYA", "PM"],
+["4:16", "SULTHANA", "PM"],
+["4:29", "NOAH", "PM"],
+["4:53", "MARIYA", "PM"],
+["4:59", "KSRTC", "PM"],
+["5:14", "NIBRAS", "PM"],
+["5:32", "MARIYA", "PM"],
+["5:40", "MARIYA", "PM"],
+["5:48", "MARIYA", "PM"],
+["6:13", "NOAH", "PM"],
+["6:23", "NOAH", "PM"],
+["6:45", "MARIYA", "PM"],
+["6:57", "MARIYA", "PM"],
+["7:06", "LMS", "PM"],
+["7:22", "MARIYA", "PM"],
+["7:53", "THACHUPARA", "PM"],
+["8:28", "SULTHANA", "PM"]</textarea>
+            
+            <button class="btn" onclick="copyToClipboard('from-thodupuzha-schedule')">📋 Copy Schedule</button>
+            <button class="btn btn-secondary" onclick="validateSchedule('from-thodupuzha-schedule')">✓ Validate Format</button>
+        </div>
+        
+        <!-- STOP TIMINGS -->
+        <div class="section">
+            <div class="section-title">⏱️ Travel Times Between Stops</div>
+            <div class="example">
+Poomala → Injikatt Kavala: 4 min
+Injikatt Kavala → Pannimattom: 3 min
+Pannimattom → Karukapally Kavala: 4 min
+Karukapally Kavala → Elamdhesham: 3 min
+Elamdhesham → Elamdhesham School: 3 min
+Elamdhesham School → Kalayanthani: 5 min
+Kalayanthani → Alacode: 4 min
+Alacode → Meenmutty: 3 min
+Meenmutty → Edavetty: 4 min
+Edavetty → Edavetty Jaram: 3 min
+Edavetty Jaram → Kumbakallu: 2 min
+Kumbakallu → Thodupuzha Stand: 10 min
+
+Total: 48 minutes (Poomala to Thodupuzha Stand)
+            </div>
+        </div>
+        
+        <!-- INSTRUCTIONS -->
+        <div class="section">
+            <div class="section-title">📖 How to Update Your Website</div>
+            <div class="info-box">
+                <strong>Step 1:</strong> Edit the schedule in the text areas above<br>
+                <strong>Step 2:</strong> Click "Validate Format" to check for errors<br>
+                <strong>Step 3:</strong> Click "Copy Schedule" to copy the data<br>
+                <strong>Step 4:</strong> Open <code>tothodupuzha.html</code> or <code>fromthodupuzha.html</code> in a text editor<br>
+                <strong>Step 5:</strong> Find the line with <code>const injikattKavalaData = [</code><br>
+                <strong>Step 6:</strong> Replace everything between <code>[</code> and <code>];</code> with your copied data<br>
+                <strong>Step 7:</strong> Save the file and upload to GitHub
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('✅ Schedule copied to clipboard!');
+        }
+        
+        function validateSchedule(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const content = textarea.value;
+            
+            try {
+                // Try to parse as JSON array
+                const parsed = JSON.parse('[' + content + ']');
+                
+                let errors = [];
+                let warnings = [];
+                
+                parsed.forEach((bus, index) => {
+                    if (!Array.isArray(bus) || bus.length !== 3) {
+                        errors.push(`Line ${index + 1}: Invalid format`);
+                    } else {
+                        const [time, name, period] = bus;
+                        
+                        // Check time format
+                        if (!/^\d{1,2}:\d{2}$/.test(time)) {
+                            errors.push(`Line ${index + 1}: Invalid time format "${time}"`);
+                        }
+                        
+                        // Check period
+                        if (period !== "AM" && period !== "PM") {
+                            errors.push(`Line ${index + 1}: Period must be "AM" or "PM", got "${period}"`);
+                        }
+                        
+                        // Check bus name
+                        if (typeof name !== 'string' || name.length === 0) {
+                            errors.push(`Line ${index + 1}: Bus name cannot be empty`);
+                        }
+                    }
+                });
+                
+                if (errors.length > 0) {
+                    alert('❌ Validation Failed:\n\n' + errors.join('\n'));
+                } else {
+                    alert(`✅ Validation Passed!\n\nTotal buses: ${parsed.length}\n\nSchedule is ready to use!`);
+                }
+                
+            } catch (e) {
+                alert('❌ JSON Parse Error:\n\n' + e.message + '\n\nMake sure each line ends with a comma except the last one.');
+            }
+        }
+    </script>
+</body>
+</html>
