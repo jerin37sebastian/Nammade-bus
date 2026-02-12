@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         
-        /* SPLASH SCREEN - Kept exactly as your original */
+        /* SPLASH SCREEN */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; display: flex; flex-direction: column;
@@ -70,13 +70,17 @@
         <span class="select-label">From (Start Point)</span>
         <select id="stopSelect">
             <option value="Poomala">Poomala</option>
-            <option value="Inchikatt Kavala" selected>Inchikatt Kavala</option>
+            <option value="Injikatt Kavala" selected>Injikatt Kavala</option>
             <option value="Pannimattom">Pannimattom</option>
+            <option value="Karukapally Kavala">Karukapally Kavala</option>
             <option value="Elamdhesham">Elamdhesham</option>
+            <option value="Elamdhesham School">Elamdhesham School</option>
             <option value="Kalayanthani">Kalayanthani</option>
             <option value="Alacode">Alacode</option>
+            <option value="Meenmutty">Meenmutty</option>
             <option value="Edavetty">Edavetty</option>
-            <option value="Kumbamkallu">Kumbamkallu</option>
+            <option value="Edavetty Jaram">Edavetty Jaram</option>
+            <option value="Kumbakallu">Kumbakallu</option>
             <option value="Thodupuzha Stand">Thodupuzha Stand</option>
         </select>
 
@@ -87,25 +91,29 @@
         <span class="select-label">To (Destination)</span>
         <select id="destSelect">
             <option value="Poomala">Poomala</option>
-            <option value="Inchikatt Kavala">Inchikatt Kavala</option>
+            <option value="Injikatt Kavala">Injikatt Kavala</option>
             <option value="Pannimattom">Pannimattom</option>
+            <option value="Karukapally Kavala">Karukapally Kavala</option>
             <option value="Elamdhesham">Elamdhesham</option>
+            <option value="Elamdhesham School">Elamdhesham School</option>
             <option value="Kalayanthani">Kalayanthani</option>
             <option value="Alacode">Alacode</option>
+            <option value="Meenmutty">Meenmutty</option>
             <option value="Edavetty">Edavetty</option>
-            <option value="Kumbamkallu">Kumbamkallu</option>
+            <option value="Edavetty Jaram">Edavetty Jaram</option>
+            <option value="Kumbakallu">Kumbakallu</option>
             <option value="Thodupuzha Stand" selected>Thodupuzha Stand</option>
         </select>
         
         <button class="btn-main" onclick="calculateJourney()">Start Journey</button>
 
         <div class="disclaimer">
-            * Schedules are approximate. may change due to traffic and weather condition.
+            *Schedules are approximate. may change due to traffic and weather condition.
         </div>
     </div>
 
     <script>
-        // SMART SPLASH LOGIC (Fixed for back-button)
+        // SMART SPLASH LOGIC
         window.addEventListener('load', () => {
             const splash = document.getElementById('splash-screen');
             if (sessionStorage.getItem('splashShown')) {
@@ -117,7 +125,7 @@
                         splash.style.visibility = 'hidden';
                         sessionStorage.setItem('splashShown', 'true');
                     }, 500);
-                }, 800); // Reduced time to be snappy
+                }, 800);
             }
         });
 
@@ -131,7 +139,21 @@
         }
 
         // NAVIGATION & DIRECTION LOGIC
-        const routeOrder = ["Poomala", "Inchikatt Kavala", "Pannimattom", "Elamdhesham", "Kalayanthani", "Alacode", "Edavetty", "Kumbamkallu", "Thodupuzha Stand"];
+        const routeOrder = [
+            "Poomala", 
+            "Injikatt Kavala", 
+            "Pannimattom", 
+            "Karukapally Kavala", 
+            "Elamdhesham", 
+            "Elamdhesham School", 
+            "Kalayanthani", 
+            "Alacode", 
+            "Meenmutty", 
+            "Edavetty", 
+            "Edavetty Jaram", 
+            "Kumbakallu", 
+            "Thodupuzha Stand"
+        ];
         
         function calculateJourney() {
             const start = document.getElementById('stopSelect').value;
