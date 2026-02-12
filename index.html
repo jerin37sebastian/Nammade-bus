@@ -5,41 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nammade Bus - Home</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2979ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nammade Bus">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #1a1a1a; min-height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         
-        /* SPLASH SCREEN */
+        /* LIGHT & DARK MODE VARIABLES */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --text-primary: #1a1a1a;
+            --text-secondary: #5f6368;
+            --text-accent: #0d47a1;
+            --accent-blue: #2979ff;
+            --particle-color: rgba(41, 121, 255, 0.4);
+            --input-bg: #f1f3f4;
+            --border-color: rgba(41, 121, 255, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0a1929;
+            --bg-card: rgba(13, 27, 42, 0.8);
+            --text-primary: #e3f2fd;
+            --text-secondary: #90caf9;
+            --text-accent: #64b5f6;
+            --accent-blue: #42a5f5;
+            --particle-color: rgba(66, 165, 245, 0.6);
+            --input-bg: #1e3a5f;
+            --border-color: rgba(66, 165, 245, 0.3);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; display: flex; flex-direction: column;
+            background: var(--bg-primary); display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 1000;
             transition: opacity 0.5s ease, visibility 0.5s;
         }
         .splash-logo {
-            width: 80px; height: 80px; background: #2979ff;
+            width: 80px; height: 80px; background: var(--accent-blue);
             border-radius: 22px; display: flex; align-items: center;
             justify-content: center; box-shadow: 0 10px 30px rgba(41, 121, 255, 0.3);
             margin-bottom: 20px; animation: pulse 2s infinite;
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .splash-text { font-weight: 800; font-size: 1.5rem; color: #0d47a1; letter-spacing: 2px; }
+        .splash-text { font-weight: 800; font-size: 1.5rem; color: var(--text-accent); letter-spacing: 2px; }
 
         #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .main-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 40px; border: 1px solid rgba(41, 121, 255, 0.1); text-align: center; width: 92%; max-width: 400px; box-shadow: 0 20px 60px rgba(41, 121, 255, 0.15); position: relative; z-index: 1; }
         
-        h1 { font-weight: 800; letter-spacing: 2px; margin-bottom: 5px; font-size: 1.8rem; color: #0d47a1; }
-        .subtitle { font-size: 0.7rem; color: #5f6368; margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
+        .main-card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(10px); 
+            padding: 30px; 
+            border-radius: 40px; 
+            border: 1px solid var(--border-color); 
+            text-align: center; 
+            width: 92%; 
+            max-width: 400px; 
+            box-shadow: 0 20px 60px rgba(41, 121, 255, 0.15); 
+            position: relative; 
+            z-index: 1;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
         
-        .select-label { font-size: 0.65rem; font-weight: 800; color: #2979ff; text-transform: uppercase; margin-bottom: 5px; display: block; letter-spacing: 1px;}
-        select { width: 100%; padding: 16px; background: #f1f3f4; border: 2px solid transparent; color: #1a1a1a; border-radius: 18px; outline: none; font-size: 1rem; font-weight: 700; transition: 0.3s; text-align-last: center; }
-        select:focus { border-color: #2979ff; background: white; }
+        h1 { font-weight: 800; letter-spacing: 2px; margin-bottom: 5px; font-size: 1.8rem; color: var(--text-accent); }
+        .subtitle { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
         
-        /* FLIP BUTTON STYLING */
+        .select-label { font-size: 0.65rem; font-weight: 800; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 5px; display: block; letter-spacing: 1px;}
+        select { 
+            width: 100%; padding: 16px; background: var(--input-bg); border: 2px solid transparent; 
+            color: var(--text-primary); border-radius: 18px; outline: none; font-size: 1rem; 
+            font-weight: 700; transition: 0.3s; text-align-last: center;
+        }
+        select:focus { border-color: var(--accent-blue); background: var(--bg-card); }
+        
         .flip-btn-container { margin: 10px 0; position: relative; height: 30px; }
         .btn-flip {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #2979ff; color: white; border: 4px solid #ffffff;
+            background: var(--accent-blue); color: white; border: 4px solid var(--bg-primary);
             width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
             box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3); z-index: 2;
             display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
@@ -47,10 +104,26 @@
         }
         .btn-flip:active { transform: translate(-50%, -50%) scale(0.9) rotate(180deg); }
 
-        .btn-main { display: block; width: 100%; padding: 20px; margin-top: 20px; border-radius: 20px; border: none; background: #2979ff; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 10px 25px rgba(41, 121, 255, 0.3); transition: 0.3s; }
+        .btn-main { 
+            display: block; width: 100%; padding: 20px; margin-top: 20px; border-radius: 20px; 
+            border: none; background: var(--accent-blue); color: white; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(41, 121, 255, 0.3); transition: 0.3s;
+        }
         .btn-main:active { transform: scale(0.97); }
         
-        .disclaimer { font-size: 0.65rem; color: #9aa0a6; margin-top: 20px; line-height: 1.4; font-style: italic; }
+        .disclaimer { font-size: 0.65rem; color: var(--text-secondary); margin-top: 20px; line-height: 1.4; font-style: italic; }
+        
+        /* DARK MODE TOGGLE */
+        .theme-toggle {
+            position: fixed; top: 20px; right: 20px; width: 50px; height: 50px;
+            background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:active { transform: scale(0.9) rotate(180deg); }
+        .theme-icon { font-size: 1.5rem; }
     </style>
 </head>
 <body>
@@ -60,6 +133,10 @@
         </div>
         <div class="splash-text">NAMMADE BUS</div>
     </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <span class="theme-icon" id="theme-icon">🌙</span>
+    </button>
 
     <canvas id="particleCanvas"></canvas>
 
@@ -108,12 +185,40 @@
         <button class="btn-main" onclick="calculateJourney()">Start Journey</button>
 
         <div class="disclaimer">
-            *Schedules are approximate. may change due to traffic and weather condition.
+            * Schedules are approximate.May change due to traffic and weather condition.
         </div>
     </div>
 
     <script>
-        // SMART SPLASH LOGIC
+        // DARK MODE
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setTheme(prefersDark ? 'dark' : 'light');
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) setTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('theme-icon').innerText = theme === 'dark' ? '☀️' : '🌙';
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0a1929' : '#2979ff');
+        }
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        initTheme();
+
+        // SPLASH
         window.addEventListener('load', () => {
             const splash = document.getElementById('splash-screen');
             if (sessionStorage.getItem('splashShown')) {
@@ -129,7 +234,6 @@
             }
         });
 
-        // FLIP FUNCTION
         function flipLocations() {
             const start = document.getElementById('stopSelect');
             const dest = document.getElementById('destSelect');
@@ -138,39 +242,16 @@
             dest.value = temp;
         }
 
-        // NAVIGATION & DIRECTION LOGIC
-        const routeOrder = [
-            "Poomala", 
-            "Injikatt Kavala", 
-            "Pannimattom", 
-            "Karukapally Kavala", 
-            "Elamdhesham", 
-            "Elamdhesham School", 
-            "Kalayanthani", 
-            "Alacode", 
-            "Meenmutty", 
-            "Edavetty", 
-            "Edavetty Jaram", 
-            "Kumbakallu", 
-            "Thodupuzha Stand"
-        ];
+        const routeOrder = ["Poomala", "Injikatt Kavala", "Pannimattom", "Karukapally Kavala", "Elamdhesham", "Elamdhesham School", "Kalayanthani", "Alacode", "Meenmutty", "Edavetty", "Edavetty Jaram", "Kumbakallu", "Thodupuzha Stand"];
         
         function calculateJourney() {
             const start = document.getElementById('stopSelect').value;
             const end = document.getElementById('destSelect').value;
-            
-            if (start === end) {
-                alert("Please select a different destination!");
-                return;
-            }
-
+            if (start === end) { alert("Please select a different destination!"); return; }
             localStorage.setItem('selectedStopName', start);
             localStorage.setItem('userDestination', end);
-
             const startIndex = routeOrder.indexOf(start);
             const endIndex = routeOrder.indexOf(end);
-
-            // Logic: Moving towards Thodupuzha (down the list) or Poomala (up the list)
             if (endIndex > startIndex) {
                 window.location.href = "tothodupuzha.html";
             } else {
@@ -178,11 +259,43 @@
             }
         }
 
-        // BACKGROUND PARTICLES
-        const canvas = document.getElementById('particleCanvas'); const ctx = canvas.getContext('2d'); let particles = [];
-        function init() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particles = []; for(let i=0; i<60; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1, sp: Math.random()*0.3+0.1, o: Math.random()*0.4+0.1}); }
-        function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p => { p.y -= p.sp; if(p.y<0) p.y=canvas.height; ctx.fillStyle = `rgba(41, 121, 255, ${p.o})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
+        // PARTICLES
+        const canvas = document.getElementById('particleCanvas'); 
+        const ctx = canvas.getContext('2d'); 
+        let particles = [];
+        function init() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            particles = []; 
+            for(let i=0; i<60; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1, sp: Math.random()*0.3+0.1, o: Math.random()*0.4+0.1});
+        }
+        function draw() { 
+            ctx.clearRect(0,0,canvas.width,canvas.height); 
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            particles.forEach(p => { 
+                p.y -= p.sp; 
+                if(p.y<0) p.y=canvas.height; 
+                ctx.fillStyle = isDark ? `rgba(66, 165, 245, ${p.o * 1.5})` : `rgba(41, 121, 255, ${p.o})`;
+                ctx.beginPath(); 
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); 
+                ctx.fill(); 
+            }); 
+            requestAnimationFrame(draw); 
+        }
         window.onresize = init; init(); draw();
+        
+        // PWA INSTALL
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                if (confirm('📱 Install Nammade Bus as an app for quick access?')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                }
+            }, 3000);
+        });
     </script>
 </body>
 </html>
