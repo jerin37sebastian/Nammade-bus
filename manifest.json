@@ -1,0 +1,42 @@
+{
+  "name": "Nammade Bus",
+  "short_name": "Nammade Bus",
+  "description": "Real-time bus schedule for Poomala to Thodupuzha route",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2979ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "navigation", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "To Thodupuzha",
+      "short_name": "To Thodupuzha",
+      "description": "View buses going to Thodupuzha",
+      "url": "/tothodupuzha.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "To Poomala",
+      "short_name": "To Poomala",
+      "description": "View buses going to Poomala",
+      "url": "/fromthodupuzha.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
