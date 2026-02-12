@@ -31,12 +31,50 @@
         .arrival-time { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 10px; color: #0d47a1; }
         #bus-countdown { font-size: 1.2rem; font-weight: 800; color: #00c853; }
         
+        /* NO MORE BUSES */
+        .no-buses-msg { font-size: 1rem; color: #d32f2f; font-weight: 700; }
+        
         /* SEARCH & LIST STYLING */
         #search-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #e3f2fd; margin-bottom: 15px; outline: none; font-family: 'Inter'; font-weight: 600; }
         #toggle-btn { background: #e3f2fd; border: 1px solid rgba(41, 121, 255, 0.2); color: #1976d2; padding: 15px 35px; border-radius: 25px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-bottom: 20px; width: 100%; }
-        #full-list-container { display: none; margin-top: 10px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; border: 1px solid rgba(41, 121, 255, 0.1); margin-bottom: 100px; }
+        #full-list-container { display: none; margin-top: 10px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; border: 1px solid rgba(41, 121, 255, 0.1); margin-bottom: 20px; }
         .list-row { display: flex; justify-content: space-between; padding: 18px 25px; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
         .highlight-row { background: #2979ff !important; border-radius: 20px; color: white; transform: scale(1.02); }
+
+        /* BUY ME A CHAYA */
+        .support-box {
+            background: rgba(255, 193, 7, 0.1); 
+            backdrop-filter: blur(10px);
+            border-radius: 25px; 
+            padding: 20px; 
+            margin-bottom: 100px;
+            border: 1.5px solid rgba(255, 193, 7, 0.3);
+            text-align: center;
+        }
+        .support-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+        .support-desc {
+            font-size: 0.85rem;
+            color: #5f6368;
+            margin-bottom: 15px;
+        }
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: #f1f3f4;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #9aa0a6;
+            font-weight: 600;
+        }
 
         /* FLOATING SEARCH ICON */
         .search-fab {
@@ -84,6 +122,15 @@
             <input type="text" id="search-input" placeholder="Search bus name..." onkeyup="filterList()">
             <div id="list-items"></div>
         </div>
+
+        <div class="support-box">
+            <div class="support-title">☕ Buy Me a Chaya</div>
+            <div class="support-desc">Enjoying this app? Support with a small treat!</div>
+            <div class="qr-placeholder">
+                Google Pay QR Code
+                <br>(Upload yours)
+            </div>
+        </div>
     </div>
 
     <button class="search-fab" id="search-fab" onclick="toggleList()">
@@ -97,8 +144,8 @@
         function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p => { p.y -= p.sp; if(p.y<0) p.y=canvas.height; ctx.fillStyle = `rgba(41, 121, 255, ${p.o})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
         window.onresize = init; init(); draw();
 
-        // 2. BUS DATA - BASE TIMINGS AT INCHIKATT KAVALA
-        const inchikattKavalaData = [
+        // 2. BUS DATA - BASE TIMINGS AT INJIKATT KAVALA
+        const injikattKavalaData = [
             ["5:50", "NOAH", "AM"],
             ["6:15", "MARIYA", "AM"],
             ["6:20", "MARIYA", "AM"],
@@ -151,23 +198,27 @@
             ["6:05", "MARIYA", "PM"]
         ];
         
-        // Offsets FROM Inchikatt Kavala (in minutes)
+        // Offsets FROM Injikatt Kavala (in minutes)
         const offsets = { 
-            "Poomala": -2,
-            "Inchikatt Kavala": 0, 
-            "Pannimattom": 1, 
-            "Elamdhesham": 4, 
-            "Kalayanthani": 11, 
-            "Alacode": 16, 
-            "Edavetty": 25, 
-            "Kumbamkallu": 29, 
-            "Thodupuzha Stand": 33 
+            "Poomala": -4,
+            "Injikatt Kavala": 0, 
+            "Pannimattom": 3, 
+            "Karukapally Kavala": 7,
+            "Elamdhesham": 10, 
+            "Elamdhesham School": 14,
+            "Kalayanthani": 19, 
+            "Alacode": 22, 
+            "Meenmutty": 25,
+            "Edavetty": 29, 
+            "Edavetty Jaram": 32,
+            "Kumbakallu": 34, 
+            "Thodupuzha Stand": 44 
         };
 
-        const stop = localStorage.getItem('selectedStopName') || "Inchikatt Kavala";
+        const stop = localStorage.getItem('selectedStopName') || "Injikatt Kavala";
         const destination = localStorage.getItem('userDestination') || "Thodupuzha Stand";
         
-        // Update header with dynamic destination and from location
+        // Update header
         document.getElementById('route-header').innerText = `TO ${destination.toUpperCase()}`;
         document.getElementById('loc-name').innerText = stop;
 
@@ -175,7 +226,7 @@
         const ads = {
             "Poomala": { n: "Poomala Heights", d: "The best view and coffee at the top.", i: "PH" },
             "Thodupuzha Stand": { n: "Metro Textiles", d: "Festival sale now live!", i: "MT" },
-            "Inchikatt Kavala": { n: "Kavala Store", d: "Fresh groceries daily.", i: "KS" }
+            "Injikatt Kavala": { n: "Kavala Store", d: "Fresh groceries daily.", i: "KS" }
         };
         const currentAd = ads[stop] || { n: "Local Business", d: "Grow your reach with Nammade Bus.", i: "NB" };
         document.getElementById('ad-title').innerText = currentAd.n;
@@ -198,41 +249,37 @@
             let listHTML = "";
             const stopOffset = offsets[stop] || 0;
 
-            inchikattKavalaData.forEach((bus, index) => {
+            injikattKavalaData.forEach((bus, index) => {
                 let [t, n, p] = bus; 
                 let [h, m] = t.split(':').map(Number);
                 
-                // Convert to minutes since midnight - FIXED for 12 PM
+                // Convert to minutes - FIXED for 12 PM
                 let baseTotal;
                 if (p === "AM") {
                     if (h === 12) {
-                        baseTotal = m; // 12:xx AM = midnight hour
+                        baseTotal = m;
                     } else {
-                        baseTotal = h * 60 + m; // 1-11 AM
+                        baseTotal = h * 60 + m;
                     }
-                } else { // PM
+                } else {
                     if (h === 12) {
-                        baseTotal = 720 + m; // 12:xx PM = noon hour (720 = 12*60)
+                        baseTotal = 720 + m;
                     } else {
-                        baseTotal = (h + 12) * 60 + m; // 1-11 PM
+                        baseTotal = (h + 12) * 60 + m;
                     }
                 }
                 
-                // Add offset for current stop
                 let total = baseTotal + stopOffset;
                 
-                // Find next bus
                 if (nextBusIndex === -1 && total > currentMins) {
                     nextBusIndex = index;
                     nextBusTime = total;
                 }
 
-                // Calculate display time
                 let nh = Math.floor(total / 60) % 24; 
                 let nm = Math.round(total % 60);
                 let timeStr = `${nh % 12 || 12}:${nm.toString().padStart(2,'0')} ${nh >= 12 ? 'PM' : 'AM'}`;
                 
-                // Update UI for next bus
                 if (index === nextBusIndex) {
                     document.getElementById('bus-name').innerText = n;
                     document.getElementById('bus-time').innerText = timeStr;
@@ -242,6 +289,14 @@
                 
                 listHTML += `<div class="list-row ${index === nextBusIndex ? 'highlight-row' : ''}"><span>${timeStr}</span><span>${n}</span></div>`;
             });
+            
+            // NO MORE BUSES TODAY
+            if (nextBusIndex === -1) {
+                document.getElementById('bus-name').innerText = "No more buses";
+                document.getElementById('bus-time').innerText = "😴";
+                document.getElementById('bus-countdown').innerHTML = '<span class="no-buses-msg">Service ended for today</span>';
+            }
+            
             document.getElementById('list-items').innerHTML = listHTML;
         }
 
@@ -253,11 +308,11 @@
             if (container.style.display === "block") {
                 container.style.display = "none"; 
                 btn.innerText = "View Full Schedule";
-                fab.classList.remove('hidden'); // Show FAB when list is closed
+                fab.classList.remove('hidden');
             } else {
                 container.style.display = "block"; 
                 btn.innerText = "Hide Schedule";
-                fab.classList.add('hidden'); // Hide FAB when list is open
+                fab.classList.add('hidden');
                 document.getElementById('search-input').focus();
                 window.scrollTo(0, document.body.scrollHeight);
             }
