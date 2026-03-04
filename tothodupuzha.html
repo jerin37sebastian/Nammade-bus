@@ -179,9 +179,58 @@
         function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; particles.forEach(p => { p.y -= p.sp; if(p.y<0) p.y=canvas.height; ctx.fillStyle = isDark ? `rgba(66, 165, 245, ${p.o * 1.5})` : `rgba(41, 121, 255, ${p.o})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
         window.onresize = init; init(); draw();
 
-        const injikattKavalaData = [["5:50", "NOAH", "AM"], ["6:15", "MARIYA", "AM"], ["6:20", "MARIYA", "AM"], ["6:35", "NOAH", "AM"], ["6:45", "MARIYA", "AM"], ["7:05", "LMS", "AM"], ["7:20", "MARIYA", "AM"], ["7:30", "THACHUPARA", "AM"], ["7:40", "NIBRAS", "AM"], ["7:55", "MARIYA", "AM"], ["8:05", "SULTHANA", "AM"], ["8:21", "NOAH", "AM"], ["8:35", "NOAH", "AM"], ["8:49", "MARIYA", "AM"], ["9:05", "MARIYA", "AM"], ["9:22", "MARIYA", "AM"], ["9:35", "NIBRAS", "AM"], ["9:41", "MARIYA", "AM"], ["9:57", "MARIYA", "AM"], ["10:24", "NOAH", "AM"], ["10:40", "NOAH", "AM"], ["10:56", "MARIYA", "AM"], ["11:32", "NIBRAS", "AM"], ["11:40", "MARIYA", "AM"], ["11:49", "MARIYA", "AM"], ["11:57", "MARIYA", "AM"], ["12:15", "MARIYA", "PM"], ["12:30", "SULTHANA", "PM"], ["12:55", "NOAH", "PM"], ["1:05", "NOAH", "PM"], ["1:30", "MARIYA", "PM"], ["1:44", "MARIYA", "PM"], ["1:54", "MARIYA", "PM"], ["2:20", "NIBRAS", "PM"], ["2:34", "MARIYA", "PM"], ["2:41", "MARIYA", "PM"], ["2:50", "NOAH", "PM"], ["3:13", "MARIYA", "PM"], ["3:25", "MARIYA", "PM"], ["3:35", "NOAH", "PM"], ["3:54", "MARIYA", "PM"], ["4:21", "NIBRAS", "PM"], ["4:35", "MARIYA", "PM"], ["4:45", "NOAH", "PM"], ["4:53", "MARIYA", "PM"], ["5:05", "MARIYA", "PM"], ["5:20", "SULTHANA", "PM"], ["5:36", "NOAH", "PM"], ["5:52", "MARIYA", "PM"], ["6:05", "MARIYA", "PM"]];
-        
-        const offsets = { "Poomala": -4, "Injikatt Kavala": 0, "Pannimattom": 3, "Karukapally Kavala": 7, "Elamdhesham": 10, "Elamdhesham School": 14, "Kalayanthani": 19, "Alacode": 22, "Meenmutty": 25, "Edavetty": 29, "Edavetty Jaram": 32, "Kumbakallu": 34, "Thodupuzha Stand": 44 };
+        const injikattKavalaData = [
+    ["5:50", "NOAH", "AM"],
+    ["6:15", "MARIYA", "AM"],
+    ["6:20", "MARIYA", "AM"],
+    ["6:35", "NOAH", "AM"],
+    ["6:45", "MARIYA", "AM"],
+    ["7:05", "LMS", "AM"],
+    ["7:20", "MARIYA", "AM"],
+    ["7:30", "THACHUPARAMBIL", "AM"],
+    ["7:40", "NIBRAS", "AM"],
+    ["7:55", "MARIYA", "AM"],
+    ["8:05", "SULTHANA", "AM"],
+    ["8:21", "NOAH", "AM"],
+    ["8:35", "NOAH", "AM"],
+    ["8:49", "MARIYA", "AM"],
+    ["9:05", "MARIYA", "AM"],
+    ["9:22", "MARIYA", "AM"],
+    ["9:35", "NIBRAS", "AM"],
+    ["9:41", "MARIYA", "AM"],
+    ["9:57", "MARIYA", "AM"],
+    ["10:24", "NOAH", "AM"],
+    ["10:40", "NOAH", "AM"],
+    ["10:56", "MARIYA", "AM"],
+    ["11:32", "NIBRAS", "AM"],
+    ["11:40", "MARIYA", "AM"],
+    ["11:49", "MARIYA", "AM"],
+    ["11:57", "MARIYA", "AM"],
+    ["12:15", "MARIYA", "PM"],
+    ["12:30", "SULTHANA", "PM"],
+    ["12:55", "NOAH", "PM"],
+    ["1:05", "NOAH", "PM"],
+    ["1:30", "MARIYA", "PM"],
+    ["1:44", "MARIYA", "PM"],
+    ["1:54", "MARIYA", "PM"],
+    ["2:20", "NIBRAS", "PM"],
+    ["2:34", "MARIYA", "PM"],
+    ["2:41", "MARIYA", "PM"],
+    ["2:50", "NOAH", "PM"],
+    ["3:13", "MARIYA", "PM"],
+    ["3:25", "MARIYA", "PM"],
+    ["3:35", "NOAH", "PM"],
+    ["3:54", "MARIYA", "PM"],
+    ["4:21", "NIBRAS", "PM"],
+    ["4:35", "MARIYA", "PM"],
+    ["4:45", "NOAH", "PM"],
+    ["4:53", "MARIYA", "PM"],
+    ["5:05", "MARIYA", "PM"],
+    ["5:20", "SULTHANA", "PM"],
+    ["5:36", "NOAH", "PM"],
+    ["5:52", "MARIYA", "PM"],
+    ["6:05", "MARIYA", "PM"]
+];  const offsets = { "Poomala": -4, "Injikatt Kavala": 0, "Pannimattom": 3, "Karukapally Kavala": 7, "Elamdhesham": 10, "Elamdhesham School": 14, "Kalayanthani": 19, "Alacode": 22, "Meenmutty": 25, "Edavetty": 29, "Edavetty Jaram": 32, "Kumbakallu": 34, "Thodupuzha Stand": 44 };
 
         const stop = localStorage.getItem('selectedStopName') || "Injikatt Kavala";
         const destination = localStorage.getItem('userDestination') || "Thodupuzha Stand";
