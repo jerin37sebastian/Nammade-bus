@@ -351,14 +351,16 @@
             <button class="gpay-close" onclick="closeGpayModal()">×</button>
             <div class="gpay-title">☕ Support Nammade Bus</div>
             <div class="gpay-qr">
-                <div>Upload your<br>GPay QR Code<br>as GPAYQR.pjg</div>
-                 <img src="GPAYQR.png" alt="GPay QR" class="gpay-btn"> 
+                <img src="GPAYQR.png" alt="GPay QR Code" onerror="this.parentElement.innerHTML='<div>Upload your<br>GPay QR Code<br>as GPAYQR.png</div>'">
             </div>
             <div style="margin: 15px 0; padding: 12px; background: rgba(0,200,83,0.1); border-radius: 12px;">
                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">UPI ID</div>
-                <div style="font-weight: 700; color: var(--text-accent); font-size: 0.9rem;">jerin17sebastian@okhdfcbank</div>
+                <div style="font-weight: 700; color: var(--text-accent); font-size: 0.9rem; margin-bottom: 8px;">jerin17sebastian@okhdfcbank</div>
+                <button onclick="copyUpiId()" style="background: rgba(0,200,83,0.2); border: 1px solid rgba(0,200,83,0.4); color: #00c853; padding: 8px 16px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                    📋 Copy UPI ID
+                </button>
             </div>
-            <button class="gpay-donate-btn" onclick="openUpiApp()">💚 Donate Now</button>
+            <button class="gpay-donate-btn" onclick="openUpiApp()">💚 Pay with UPI App</button>
         </div>
     </div>
 
@@ -447,13 +449,31 @@
         function closeGpayModal() {
             document.getElementById('gpay-modal').classList.remove('show');
         }
+        function copyUpiId() {
+            const upiId = 'jerin17sebastian@okhdfcbank';
+            navigator.clipboard.writeText(upiId).then(() => {
+                alert('✅ UPI ID copied!\n\n' + upiId + '\n\nPaste in your UPI app to pay.');
+            }).catch(() => {
+                alert('UPI ID: ' + upiId + '\n\nPlease copy manually.');
+            });
+        }
         function openUpiApp() {
+            // UPI deep link - opens GPay/PhonePe/Paytm with pre-filled UPI ID
+            // NO AMOUNT - user enters their own amount
             const upiId = 'jerin17sebastian@okhdfcbank';
             const name = 'Jerin Sebastian';
             const note = 'Support Nammade Bus';
+            
+            // Create UPI link without amount parameter
             const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&tn=${encodeURIComponent(note)}`;
             
-            window.location.href = upiLink;
+            // Try to open UPI app
+            try {
+                window.location.href = upiLink;
+            } catch (error) {
+                // Fallback: show UPI ID for manual payment
+                alert('UPI ID: ' + upiId + '\n\nPlease copy this ID and pay using your UPI app.');
+            }
         }
 
         // UPDATE UI - CREATE SWIPEABLE CARDS
