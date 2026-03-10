@@ -18,9 +18,6 @@
             --accent-blue: #2979ff;
             --input-bg: #f1f3f4;
             --border-color: rgba(41, 121, 255, 0.1);
-            --support-bg: rgba(255, 193, 7, 0.1);
-            --support-border: rgba(255, 193, 7, 0.3);
-            --support-text: #f57c00;
         }
         
         [data-theme="dark"] {
@@ -32,9 +29,6 @@
             --accent-blue: #42a5f5;
             --input-bg: #1a2332;
             --border-color: rgba(66, 165, 245, 0.3);
-            --support-bg: rgba(255, 193, 7, 0.15);
-            --support-border: rgba(255, 193, 7, 0.4);
-            --support-text: #ffb74d;
         }
         
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; transition: background 0.3s ease, color 0.3s ease; }
@@ -43,95 +37,300 @@
 
         .container { width: 95%; max-width: 500px; text-align: center; padding: 40px 20px; margin: 0 auto; position: relative; z-index: 1; }
         
+        /* CHANGE TRIP BUTTON */
+        .change-trip-btn {
+            background: white;
+            color: var(--accent-blue);
+            border: 1.5px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        .change-trip-btn:hover { background: var(--accent-blue); color: white; }
+        [data-theme="dark"] .change-trip-btn { background: var(--bg-card); }
+        
+        /* AD BANNER - BIGGER */
         .ad-box-wrapper { 
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
-            border-radius: 25px; padding: 15px; margin-bottom: 25px; 
-            border: 1.5px solid var(--border-color); text-align: left;
-            display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(10px);
+            border-radius: 25px; 
+            padding: 25px 20px;
+            margin-bottom: 25px; 
+            border: 1.5px solid var(--border-color); 
+            text-align: left;
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             transition: background 0.3s ease;
         }
         [data-theme="dark"] .ad-box-wrapper { background: var(--bg-card); }
-        .ad-icon { width: 50px; height: 50px; background: var(--accent-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.2rem; flex-shrink: 0; }
-        .ad-tag { font-size: 0.6rem; font-weight: 800; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 2px; }
-        .ad-title { font-weight: 800; color: var(--text-accent); font-size: 0.95rem; }
-        .ad-desc { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.2; }
+        .ad-icon { width: 60px; height: 60px; background: var(--accent-blue); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.4rem; flex-shrink: 0; }
+        .ad-tag { font-size: 0.65rem; font-weight: 800; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .ad-title { font-weight: 800; color: var(--text-accent); font-size: 1.1rem; margin-bottom: 3px; }
+        .ad-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3; }
 
-        .next-bus-card { background: var(--bg-card); backdrop-filter: blur(12px); border-radius: 40px; padding: 40px 25px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(41, 121, 255, 0.1); margin-bottom: 30px; transition: background 0.3s ease; }
-        .label { color: var(--accent-blue); text-transform: uppercase; letter-spacing: 3px; font-size: 0.7rem; font-weight: 800; margin-bottom: 15px; display: block; }
-        .arrival-time { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 10px; color: var(--text-accent); }
-        #bus-countdown { font-size: 1.2rem; font-weight: 800; color: #00c853; }
+        /* SWIPEABLE BUS CARDS CONTAINER */
+        .bus-carousel-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            margin-bottom: 30px;
+            scroll-snap-type: x mandatory;
+        }
+        .bus-carousel-container::-webkit-scrollbar { display: none; }
+        
+        .bus-carousel {
+            display: flex;
+            gap: 20px;
+            padding: 0 10px;
+        }
+        
+        /* INDIVIDUAL BUS CARD (SWIPEABLE) */
+        .next-bus-card { 
+            min-width: calc(100% - 20px);
+            background: var(--bg-card); 
+            backdrop-filter: blur(12px); 
+            border-radius: 35px; 
+            padding: 35px 22px 22px 22px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 15px 35px rgba(41, 121, 255, 0.1); 
+            transition: background 0.3s ease;
+            scroll-snap-align: center;
+            flex-shrink: 0;
+        }
+        .label { color: var(--accent-blue); text-transform: uppercase; letter-spacing: 3px; font-size: 0.68rem; font-weight: 800; margin-bottom: 12px; display: block; }
+        .arrival-time { font-size: 4rem; font-weight: 800; line-height: 1; margin-bottom: 10px; color: var(--text-accent); }
+        .bus-countdown { font-size: 1.1rem; font-weight: 800; color: #00c853; margin-bottom: 18px; display: block; }
         .no-buses-msg { font-size: 1rem; color: #d32f2f; font-weight: 700; }
         
+        /* JOURNEY STATUS BUTTON */
+        .journey-status-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .journey-status-btn:active { transform: scale(0.98); }
+        
+        /* JOURNEY STATUS EXPANDED */
+        .journey-details {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 20px;
+            display: none;
+        }
+        [data-theme="dark"] .journey-details { background: rgba(255,255,255,0.05); }
+        .journey-details.show { display: block; }
+        .journey-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] .journey-stat { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .journey-stat:last-child { border-bottom: none; }
+        .stat-label { color: var(--text-secondary); font-size: 0.85rem; }
+        .stat-value { color: var(--text-accent); font-weight: 700; font-size: 0.95rem; }
+        .progress-container { margin-top: 15px; }
+        .progress-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; text-align: left; }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .progress-bar { background: rgba(255,255,255,0.1); }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2979ff, #667eea);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        /* SWIPE INDICATOR */
+        .swipe-indicator {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        /* FULL SCHEDULE */
         #search-input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #e3f2fd; margin-bottom: 15px; outline: none; font-family: 'Inter'; font-weight: 600; background: var(--input-bg); color: var(--text-primary); transition: background 0.3s ease; }
         #toggle-btn { background: #e3f2fd; border: 1px solid var(--border-color); color: #1976d2; padding: 15px 35px; border-radius: 25px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-bottom: 20px; width: 100%; transition: background 0.3s ease; }
         [data-theme="dark"] #toggle-btn { background: var(--input-bg); color: var(--accent-blue); }
-        #full-list-container { display: none; margin-top: 10px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; border: 1px solid var(--border-color); margin-bottom: 20px; transition: background 0.3s ease; }
+        #full-list-container { display: none; margin-top: 10px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; border: 1px solid var(--border-color); margin-bottom: 100px; transition: background 0.3s ease; }
         .list-row { display: flex; justify-content: space-between; padding: 18px 25px; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; color: var(--text-primary); }
         [data-theme="dark"] .list-row { border-bottom: 1px solid rgba(255,255,255,0.05); }
         .highlight-row { background: var(--accent-blue) !important; border-radius: 20px; color: white; transform: scale(1.02); }
 
-        .support-box {
-            background: var(--support-bg); 
-            backdrop-filter: blur(10px);
-            border-radius: 25px; 
-            padding: 20px; 
-            margin-bottom: 100px;
-            border: 1.5px solid var(--support-border);
-            text-align: center;
-            transition: background 0.3s ease;
-        }
-        .support-title { font-size: 1.1rem; font-weight: 800; color: var(--support-text); margin-bottom: 10px; }
-        .support-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; }
-        .qr-placeholder { width: 200px; height: 200px; margin: 0 auto; background: #f1f3f4; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #9aa0a6; font-weight: 600; }
-        [data-theme="dark"] .qr-placeholder { background: var(--input-bg); }
-
-        .search-fab, .theme-toggle, .share-btn {
-            position: fixed; width: 50px; height: 50px; background: var(--bg-card);
-            backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;
+        /* FLOATING BUTTONS - WITH IMAGE PLACEHOLDERS */
+        .search-fab, .theme-toggle, .share-btn, .gpay-btn {
+            position: fixed; 
+            width: 50px; 
+            height: 50px; 
+            background: var(--bg-card);
+            backdrop-filter: blur(10px); 
+            border: 1px solid var(--border-color); 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
         .search-fab { bottom: 30px; right: 30px; }
         .search-fab.hidden { opacity: 0; visibility: hidden; }
         .theme-toggle { top: 20px; right: 20px; }
-        .theme-toggle:active { transform: scale(0.9) rotate(180deg); }
+        .theme-toggle:active { transform: scale(0.9); }
         .share-btn { top: 80px; right: 20px; }
         .share-btn:active { transform: scale(0.9); }
-        .theme-icon { font-size: 1.5rem; }
+        .gpay-btn { top: 140px; right: 20px; }
+        .gpay-btn:active { transform: scale(0.9); }
+        
+        /* BUTTON IMAGES */
+        .btn-image {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        
+        /* GPAY MODAL */
+        .gpay-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .gpay-modal.show { display: flex; }
+        .gpay-content {
+            background: var(--bg-primary);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .gpay-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .gpay-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-accent);
+            margin-bottom: 20px;
+        }
+        .gpay-qr {
+            width: 250px;
+            height: 250px;
+            background: #f1f3f4;
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9aa0a6;
+            font-weight: 600;
+        }
+        [data-theme="dark"] .gpay-qr { background: var(--input-bg); }
+        .gpay-qr img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 20px;
+        }
+        .gpay-donate-btn {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        .gpay-donate-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
 
+    <!-- FLOATING BUTTONS WITH IMAGE PLACEHOLDERS -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
-        <span class="theme-icon" id="theme-icon">🌙</span>
+        <img src="theme-light.png" alt="Theme" class="btn-image" id="theme-icon">
     </button>
 
     <button class="share-btn" onclick="shareTrip()" aria-label="Share trip">
-        <span style="font-size: 1.3rem;">📤</span>
+        <img src="share.png" alt="Share" class="btn-image">
+    </button>
+
+    <button class="gpay-btn" onclick="openGpayModal()" aria-label="Donate">
+        <img src="donation.png" alt="Donate" class="btn-image">
     </button>
 
     <div class="container">
         <header style="margin-bottom: 30px;">
-            <a href="index.html" style="color: var(--accent-blue); text-decoration: none; font-size: 0.8rem; font-weight: 700;">← CHANGE TRIP</a>
-            <h2 id="route-header" style="font-weight: 800; margin-top: 10px; color: var(--text-accent);">TO POOMALA</h2>
+            <a href="index.html" class="change-trip-btn">← Home</a>
+            <h2 id="route-header" style="font-weight: 800; margin-top: 15px; color: var(--text-accent);">TO POOMALA</h2>
             <div style="font-size: 0.85rem; margin-top: 5px; color: var(--text-secondary); font-weight: 600;">From: <span id="loc-name">--</span></div>
         </header>
 
+        <!-- AD BANNER (BIGGER) -->
         <div class="ad-box-wrapper">
             <div class="ad-icon" id="ad-icon">NB</div>
-            <div>
+            <div style="flex: 1;">
                 <span class="ad-tag" id="ad-tag-label">Partner Shop</span>
                 <div class="ad-title" id="ad-title">Loading...</div>
                 <div class="ad-desc" id="ad-desc">Checking for nearby offers.</div>
             </div>
         </div>
 
-        <div class="next-bus-card">
-            <span class="label" id="status-label">Next Bus Arriving</span>
-            <div id="bus-name" style="font-size:1.3rem; margin-bottom:5px; color: var(--text-primary); font-weight: 700;">--</div>
-            <div id="bus-time" class="arrival-time">--:--</div>
-            <div id="bus-countdown">Locating...</div>
+        <!-- SWIPE INDICATOR -->
+        <div class="swipe-indicator" id="swipe-indicator" style="display: none;">
+            ← Swipe to see more buses →
+        </div>
+
+        <!-- SWIPEABLE BUS CARDS -->
+        <div class="bus-carousel-container" id="bus-carousel-container">
+            <div class="bus-carousel" id="bus-carousel">
+                <!-- Bus cards will be generated here -->
+            </div>
         </div>
 
         <button id="toggle-btn" onclick="toggleList()">View Full Schedule</button>
@@ -140,19 +339,31 @@
             <input type="text" id="search-input" placeholder="Search bus name..." onkeyup="filterList()">
             <div id="list-items"></div>
         </div>
-
-        <div class="support-box">
-            <div class="support-title">☕ Buy Me a Chaya</div>
-            <div class="support-desc">Enjoying this app? Support with a small treat!</div>
-            <div class="qr-placeholder"><br><img src="GPAYQR.jpg.jpg" style="width: 200px; height: 200px; border-radius: 15px;"></div>
-        </div>
     </div>
 
     <button class="search-fab" id="search-fab" onclick="toggleList()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
 
+    <!-- GPAY MODAL -->
+    <div class="gpay-modal" id="gpay-modal">
+        <div class="gpay-content">
+            <button class="gpay-close" onclick="closeGpayModal()">×</button>
+            <div class="gpay-title">☕ Support Nammade Bus</div>
+            <div class="gpay-qr">
+                <div>Upload your<br>GPay QR Code<br>as GPAYQR.pjg</div>
+                <!-- <img src="GPAYQR.png" alt="GPay QR" style="display: none;"> -->
+            </div>
+            <div style="margin: 15px 0; padding: 12px; background: rgba(0,200,83,0.1); border-radius: 12px;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">UPI ID</div>
+                <div style="font-weight: 700; color: var(--text-accent); font-size: 0.9rem;">jerin17sebastian@okhdfcbank</div>
+            </div>
+            <button class="gpay-donate-btn" onclick="openUpiApp()">💚 Donate Now</button>
+        </div>
+    </div>
+
     <script>
+        // DARK MODE
         function initTheme() {
             const saved = localStorage.getItem('theme');
             if (saved) { setTheme(saved); } 
@@ -163,7 +374,12 @@
         }
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            document.getElementById('theme-icon').innerText = theme === 'dark' ? '☀️' : '🌙';
+            const themeIcon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                themeIcon.src = 'theme-dark.png';
+            } else {
+                themeIcon.src = 'theme-light.png';
+            }
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#0a1929' : '#2979ff');
         }
@@ -174,114 +390,238 @@
         }
         initTheme();
 
+        // PARTICLES
         const canvas = document.getElementById('particleCanvas'); const ctx = canvas.getContext('2d'); let particles = [];
         function init() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particles = []; for(let i=0; i<70; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*3+1, sp: Math.random()*0.5+0.1, o: Math.random()*0.3+0.1}); }
         function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; particles.forEach(p => { p.y -= p.sp; if(p.y<0) p.y=canvas.height; ctx.fillStyle = isDark ? `rgba(66, 165, 245, ${p.o * 1.5})` : `rgba(41, 121, 255, ${p.o})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
         window.onresize = init; init(); draw();
 
-        const injikattKavalaData = [
-    ["7:30", "NOAH", "AM"],
-    ["7:45", "MARIYA", "AM"],
-    ["8:05", "MARIYA", "AM"],
-    ["8:15", "NOAH", "AM"],
-    ["8:25", "MARIYA", "AM"],
-    ["8:42", "MARIYA", "AM"],
-    ["9:06", "MARIYA", "AM"],
-    ["9:20", "NIBRAS", "AM"],
-    ["9:35", "MARIYA", "AM"],
-    ["10:04", "NOAH", "AM"],
-    ["10:16", "NOAH", "AM"],
-    ["10:30", "MARIYA", "AM"],
-    ["11:00", "MARIYA", "AM"],
-    ["11:16", "NIBRAS", "AM"],
-    ["11:22", "MARIYA", "AM"],
-    ["11:31", "MARIYA", "AM"],
-    ["11:46", "MARIYA", "AM"],
-    ["11:57", "SULTHANA", "AM"],
-    ["12:07", "NOAH", "PM"],
-    ["12:34", "NOAH", "PM"],
-    ["12:55", "MARIYA", "PM"],
-    ["1:05", "MARIYA", "PM"],
-    ["1:21", "MARIYA", "PM"],
-    ["1:35", "MARIYA", "PM"],
-    ["1:45", "NIBRAS", "PM"],
-    ["2:00", "MARIYA", "PM"],
-    ["2:13", "MARIYA", "PM"],
-    ["2:35", "NOAH", "PM"],
-    ["2:50", "MARIYA", "PM"],
-    ["3:15", "NOAH", "PM"],
-    ["3:25", "MARIYA", "PM"],
-    ["3:47", "MARIYA", "PM"],
-    ["4:00", "NIBRAS", "PM"],
-    ["4:15", "MARIYA", "PM"],
-    ["4:19", "MARIYA", "PM"],
-    ["4:30", "NOAH", "PM"],
-    ["4:56", "MARIYA", "PM"],
-    ["5:03", "SULTHANA", "PM"],
-    ["5:16", "NOAH", "PM"],
-    ["5:40", "MARIYA", "PM"],
-    ["5:46", "KSRTC", "PM"],
-    ["6:01", "NIBRAS", "PM"],
-    ["6:19", "MARIYA", "PM"],
-    ["6:27", "MARIYA", "PM"],
-    ["6:35", "MARIYA", "PM"],
-    ["7:00", "NOAH", "PM"],
-    ["7:10", "NOAH", "PM"],
-    ["7:32", "MARIYA", "PM"],
-    ["7:44", "MARIYA", "PM"],
-    ["7:53", "LMS", "PM"],
-    ["8:09", "MARIYA", "PM"],
-    ["8:40", "THACHUPARAMBIL", "PM"],
-    ["9:15", "SULTHANA", "PM"]
-];
+        // BUS DATA - RETURN JOURNEY
+        const injikattKavalaData = [["7:30", "NOAH", "AM"], ["7:45", "MARIYA", "AM"], ["8:05", "MARIYA", "AM"], ["8:15", "NOAH", "AM"], ["8:25", "MARIYA", "AM"], ["8:42", "MARIYA", "AM"], ["9:06", "MARIYA", "AM"], ["9:20", "NIBRAS", "AM"], ["9:35", "MARIYA", "AM"], ["10:04", "NOAH", "AM"], ["10:16", "NOAH", "AM"], ["10:30", "MARIYA", "AM"], ["11:00", "MARIYA", "AM"], ["11:16", "NIBRAS", "AM"], ["11:22", "MARIYA", "AM"], ["11:31", "MARIYA", "AM"], ["11:46", "MARIYA", "AM"], ["11:57", "SULTHANA", "AM"], ["12:07", "NOAH", "PM"], ["12:34", "NOAH", "PM"], ["12:55", "MARIYA", "PM"], ["1:05", "MARIYA", "PM"], ["1:21", "MARIYA", "PM"], ["1:35", "MARIYA", "PM"], ["1:45", "NIBRAS", "PM"], ["2:00", "MARIYA", "PM"], ["2:13", "MARIYA", "PM"], ["2:35", "NOAH", "PM"], ["2:50", "MARIYA", "PM"], ["3:15", "NOAH", "PM"], ["3:25", "MARIYA", "PM"], ["3:47", "MARIYA", "PM"], ["4:00", "NIBRAS", "PM"], ["4:15", "MARIYA", "PM"], ["4:19", "MARIYA", "PM"], ["4:30", "NOAH", "PM"], ["4:56", "MARIYA", "PM"], ["5:03", "SULTHANA", "PM"], ["5:16", "NOAH", "PM"], ["5:40", "MARIYA", "PM"], ["5:46", "KSRTC", "PM"], ["6:01", "NIBRAS", "PM"], ["6:19", "MARIYA", "PM"], ["6:27", "MARIYA", "PM"], ["6:35", "MARIYA", "PM"], ["7:00", "NOAH", "PM"], ["7:10", "NOAH", "PM"], ["7:32", "MARIYA", "PM"], ["7:44", "MARIYA", "PM"], ["7:53", "LMS", "PM"], ["8:09", "MARIYA", "PM"], ["8:40", "THACHUPARAMBIL", "PM"], ["9:15", "SULTHANA", "PM"]];
+        
         const offsets = { "Thodupuzha Stand": -44, "Kumbakallu": -34, "Edavetty Jaram": -32, "Edavetty": -29, "Meenmutty": -25, "Alacode": -22, "Kalayanthani": -19, "Elamdhesham School": -14, "Elamdhesham": -10, "Karukapally Kavala": -7, "Pannimattom": -3, "Injikatt Kavala": 0, "Poomala": 4 };
+
+        const routeOrder = ["Thodupuzha Stand", "Kumbakallu", "Edavetty Jaram", "Edavetty", "Meenmutty", "Alacode", "Kalayanthani", "Elamdhesham School", "Elamdhesham", "Karukapally Kavala", "Pannimattom", "Injikatt Kavala", "Poomala"];
 
         const stop = localStorage.getItem('selectedStopName') || "Thodupuzha Stand";
         const destination = localStorage.getItem('userDestination') || "Poomala";
         document.getElementById('route-header').innerText = `TO ${destination.toUpperCase()}`;
         document.getElementById('loc-name').innerText = stop;
 
+        // ADS
         const ads = { "Poomala": { n: "Poomala Heights", d: "The best view and coffee at the top.", i: "PH" }, "Thodupuzha Stand": { n: "Metro Textiles", d: "Festival sale now live!", i: "MT" } };
         const currentAd = ads[stop] || { n: "Local Business", d: "Grow your reach with Nammade Bus.", i: "NB" };
         document.getElementById('ad-title').innerText = currentAd.n; document.getElementById('ad-desc').innerText = currentAd.d; document.getElementById('ad-icon').innerText = currentAd.i;
 
+        // JOURNEY DETAILS
+        function calculateJourneyDetails(startStop, endStop) {
+            const startIndex = routeOrder.indexOf(startStop);
+            const endIndex = routeOrder.indexOf(endStop);
+            
+            if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+                return null;
+            }
+            
+            const stopsRemaining = endIndex - startIndex;
+            const startOffset = offsets[startStop] || 0;
+            const endOffset = offsets[endStop] || 0;
+            const journeyMins = endOffset - startOffset;
+            
+            return {
+                stops: stopsRemaining,
+                minutes: journeyMins,
+                progress: ((endIndex - startIndex) / (routeOrder.length - 1)) * 100
+            };
+        }
+
+        // TOGGLE JOURNEY STATUS
+        function toggleJourneyStatus(cardId) {
+            const details = document.getElementById(`journey-details-${cardId}`);
+            details.classList.toggle('show');
+        }
+
+        // GPAY MODAL
+        function openGpayModal() {
+            document.getElementById('gpay-modal').classList.add('show');
+        }
+        function closeGpayModal() {
+            document.getElementById('gpay-modal').classList.remove('show');
+        }
+        function openUpiApp() {
+            const upiId = 'jerin17sebastian@okhdfcbank';
+            const name = 'Jerin Sebastian';
+            const note = 'Support Nammade Bus';
+            const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&tn=${encodeURIComponent(note)}`;
+            
+            window.location.href = upiLink;
+        }
+
+        // UPDATE UI - CREATE SWIPEABLE CARDS
         function updateUI() {
-            const label = document.getElementById('status-label');
-            if (stop.toLowerCase().includes("stand")) { label.innerText = "Bus will Departure at"; } else { label.innerText = "Next Bus Arriving"; }
-            const now = new Date(); const currentMins = now.getHours() * 60 + now.getMinutes();
-            let nextBusIndex = -1; let nextBusTime = -1; let listHTML = ""; const stopOffset = offsets[stop] || 0;
+            const now = new Date(); 
+            const currentMins = now.getHours() * 60 + now.getMinutes();
+            let nextBusIndex = -1; 
+            let listHTML = "";
+            const stopOffset = offsets[stop] || 0;
+
+            // Find next bus
             injikattKavalaData.forEach((bus, index) => {
-                let [t, n, p] = bus; let [h, m] = t.split(':').map(Number);
-                let baseTotal; if (p === "AM") { if (h === 12) { baseTotal = m; } else { baseTotal = h * 60 + m; } } else { if (h === 12) { baseTotal = 720 + m; } else { baseTotal = (h + 12) * 60 + m; } }
+                let [t, n, p] = bus; 
+                let [h, m] = t.split(':').map(Number);
+                let baseTotal;
+                if (p === "AM") {
+                    if (h === 12) { baseTotal = m; } else { baseTotal = h * 60 + m; }
+                } else {
+                    if (h === 12) { baseTotal = 720 + m; } else { baseTotal = (h + 12) * 60 + m; }
+                }
+                
                 let total = baseTotal + stopOffset;
-                if (nextBusIndex === -1 && total > currentMins) { nextBusIndex = index; nextBusTime = total; }
-                let nh = Math.floor(total / 60) % 24; let nm = Math.round(total % 60);
+                if (nextBusIndex === -1 && total > currentMins) { 
+                    nextBusIndex = index; 
+                }
+                
+                let nh = Math.floor(total / 60) % 24; 
+                let nm = Math.round(total % 60);
                 let timeStr = `${nh % 12 || 12}:${nm.toString().padStart(2,'0')} ${nh >= 12 ? 'PM' : 'AM'}`;
-                if (index === nextBusIndex) { document.getElementById('bus-name').innerText = n; document.getElementById('bus-time').innerText = timeStr; let minsUntil = nextBusTime - currentMins; document.getElementById('bus-countdown').innerText = `In ${minsUntil} mins`; }
+                
                 listHTML += `<div class="list-row ${index === nextBusIndex ? 'highlight-row' : ''}"><span>${timeStr}</span><span>${n}</span></div>`;
             });
-            if (nextBusIndex === -1) { document.getElementById('bus-name').innerText = "No more buses"; document.getElementById('bus-time').innerText = "😴"; document.getElementById('bus-countdown').innerHTML = '<span class="no-buses-msg">Service ended for today</span>'; }
+            
+            // NO MORE BUSES
+            if (nextBusIndex === -1) {
+                const carousel = document.getElementById('bus-carousel');
+                carousel.innerHTML = `
+                    <div class="next-bus-card">
+                        <span class="label">Service Status</span>
+                        <div style="font-size:1.2rem; margin-bottom:5px; font-weight: 700;">No more buses</div>
+                        <div class="arrival-time">😴</div>
+                        <span class="no-buses-msg">Service ended for today</span>
+                    </div>
+                `;
+                document.getElementById('swipe-indicator').style.display = 'none';
+            } else {
+                // CREATE SWIPEABLE CARDS FOR ALL REMAINING BUSES
+                let cardsHTML = '';
+                
+                for (let i = nextBusIndex; i < injikattKavalaData.length; i++) {
+                    let [t, n, p] = injikattKavalaData[i];
+                    let [h, m] = t.split(':').map(Number);
+                    let baseTotal;
+                    if (p === "AM") {
+                        if (h === 12) { baseTotal = m; } else { baseTotal = h * 60 + m; }
+                    } else {
+                        if (h === 12) { baseTotal = 720 + m; } else { baseTotal = (h + 12) * 60 + m; }
+                    }
+                    
+                    let total = baseTotal + stopOffset;
+                    let nh = Math.floor(total / 60) % 24; 
+                    let nm = Math.round(total % 60);
+                    let timeStr = `${nh % 12 || 12}:${nm.toString().padStart(2,'0')} ${nh >= 12 ? 'PM' : 'AM'}`;
+                    let minsUntil = total - currentMins;
+                    
+                    const label = (stop.toLowerCase().includes("stand")) ? "Bus will Departure at" : "Next Bus Arriving";
+                    
+                    // Calculate journey for this bus
+                    const journey = calculateJourneyDetails(stop, destination);
+                    let journeyHTML = '';
+                    
+                    if (journey) {
+                        const arrivalMins = total + journey.minutes;
+                        const arrH = Math.floor(arrivalMins / 60) % 24;
+                        const arrM = arrivalMins % 60;
+                        const arrTime = `${arrH % 12 || 12}:${Math.round(arrM).toString().padStart(2,'0')} ${arrH >= 12 ? 'PM' : 'AM'}`;
+                        
+                        const startIndex = routeOrder.indexOf(stop);
+                        const endIndex = routeOrder.indexOf(destination);
+                        const progressPercent = ((startIndex) / (endIndex)) * 100;
+                        
+                        journeyHTML = `
+                            <button class="journey-status-btn" onclick="toggleJourneyStatus(${i})">
+                                📊 Journey Status
+                            </button>
+                            
+                            <div class="journey-details" id="journey-details-${i}">
+                                <div class="journey-stat">
+                                    <span class="stat-label">🚏 Stops Remaining</span>
+                                    <span class="stat-value">${journey.stops}</span>
+                                </div>
+                                <div class="journey-stat">
+                                    <span class="stat-label">⏱️ Journey Time</span>
+                                    <span class="stat-value">${journey.minutes} mins</span>
+                                </div>
+                                <div class="journey-stat">
+                                    <span class="stat-label">📍 Arrival Time</span>
+                                    <span class="stat-value">${arrTime}</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-label">Journey Progress</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    cardsHTML += `
+                        <div class="next-bus-card">
+                            <span class="label">${label}</span>
+                            <div style="font-size:1.2rem; margin-bottom:5px; font-weight: 700;">${n}</div>
+                            <div class="arrival-time">${timeStr}</div>
+                            <span class="bus-countdown">In ${minsUntil} mins</span>
+                            ${journeyHTML}
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('bus-carousel').innerHTML = cardsHTML;
+                document.getElementById('swipe-indicator').style.display = 'block';
+            }
+            
             document.getElementById('list-items').innerHTML = listHTML;
         }
 
         function toggleList() {
-            const container = document.getElementById('full-list-container'); const btn = document.getElementById('toggle-btn'); const fab = document.getElementById('search-fab');
-            if (container.style.display === "block") { container.style.display = "none"; btn.innerText = "View Full Schedule"; fab.classList.remove('hidden'); } 
-            else { container.style.display = "block"; btn.innerText = "Hide Schedule"; fab.classList.add('hidden'); document.getElementById('search-input').focus(); window.scrollTo(0, document.body.scrollHeight); }
+            const container = document.getElementById('full-list-container'); 
+            const btn = document.getElementById('toggle-btn'); 
+            const fab = document.getElementById('search-fab');
+            if (container.style.display === "block") { 
+                container.style.display = "none"; 
+                btn.innerText = "View Full Schedule"; 
+                fab.classList.remove('hidden'); 
+            } else { 
+                container.style.display = "block"; 
+                btn.innerText = "Hide Schedule"; 
+                fab.classList.add('hidden'); 
+                document.getElementById('search-input').focus(); 
+                window.scrollTo(0, document.body.scrollHeight); 
+            }
         }
 
-        function filterList() { let input = document.getElementById('search-input').value.toUpperCase(); let rows = document.getElementsByClassName('list-row'); for (let i = 0; i < rows.length; i++) { let txt = rows[i].innerText; rows[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none"; } }
+        function filterList() { 
+            let input = document.getElementById('search-input').value.toUpperCase(); 
+            let rows = document.getElementsByClassName('list-row'); 
+            for (let i = 0; i < rows.length; i++) { 
+                let txt = rows[i].innerText; 
+                rows[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none"; 
+            } 
+        }
 
         function shareTrip() {
             const from = localStorage.getItem('selectedStopName') || 'Unknown';
             const to = localStorage.getItem('userDestination') || 'Unknown';
-            const busName = document.getElementById('bus-name')?.innerText || '--';
-            const busTime = document.getElementById('bus-time')?.innerText || '--:--';
-            const message = `🚌 Taking ${busName} bus at ${busTime}\n📍 From: ${from}\n📍 To: ${to}\n\nTrack your bus: ${window.location.href}`;
-            if (navigator.share) { navigator.share({ title: 'Nammade Bus Trip', text: message }).catch(() => {}); } 
-            else { navigator.clipboard.writeText(message).then(() => { alert('✅ Trip details copied! Paste in WhatsApp or Messages.'); }); }
+            const message = `🚌 Check out Nammade Bus!\n📍 From: ${from}\n📍 To: ${to}\n\nTrack your bus: ${window.location.href}`;
+            if (navigator.share) { 
+                navigator.share({ title: 'Nammade Bus Trip', text: message }).catch(() => {}); 
+            } else { 
+                navigator.clipboard.writeText(message).then(() => { 
+                    alert('✅ Link copied! Share in WhatsApp or Messages.'); 
+                }); 
+            }
         }
 
-        updateUI(); setInterval(updateUI, 30000);
-</script>
-                    </html>
+        updateUI(); 
+        setInterval(updateUI, 30000);
+    </script>
+</body>
+</html>
