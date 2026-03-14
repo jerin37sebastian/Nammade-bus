@@ -305,6 +305,10 @@
                 <img src="share.png" alt="Share" class="menu-item-img" onerror="this.style.display='none'; this.nextElementSibling.style.marginLeft='0';">
                 <span class="menu-item-text">Share Nammade Bus</span>
             </div>
+            <div class="menu-item" id="install-menu-item" onclick="installApp()" style="display:none;">
+    <span style="font-size: 1.3rem;">📲</span>
+    <span class="menu-item-text">Install App</span>
+            </div>
             <div class="menu-item" onclick="openAboutModal()">
                 <span style="font-size: 1.3rem;">ℹ️</span>
                 <span class="menu-item-text">About This App</span>
@@ -622,17 +626,32 @@
         window.onresize = init; init(); draw();
         
         // PWA INSTALL
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            setTimeout(() => {
-                if (confirm('📱 Install Nammade Bus as an app for quick access?')) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-                }
-            }, 3000);
-        });
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show install option in menu
+    document.getElementById('install-menu-item').style.display = 'flex';
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('install-menu-item').style.display = 'none';
+    deferredPrompt = null;
+});
+
+function installApp() {
+    if (!deferredPrompt) {
+        alert('Already installed or not available on this browser.');
+        return;
+    }
+    closeMenu();
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((result) => {
+        deferredPrompt = null;
+        document.getElementById('install-menu-item').style.display = 'none';
+    });
+        }
         // Debug console messages
         console.log('Nammade Bus - Index loaded successfully');
         console.log('Theme:', document.documentElement.getAttribute('data-theme'));
