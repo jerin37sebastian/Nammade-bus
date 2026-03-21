@@ -482,6 +482,8 @@
         }
         .contact-link:hover { text-decoration: underline; }
     </style>
+    <script src="firebase-config.js"></script>
+<script src="bus-overrides.js"></script>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
@@ -871,16 +873,19 @@
         }
 
         // ===== UPDATE UI =====
-        function updateUI() {
-            const now = new Date();
-            const currentMins = now.getHours() * 60 + now.getMinutes();
-            let nextBusIndex = -1;
-            let listHTML = "";
-            const stopOffset = offsets[stop] || 0;
-            const pinnedBus = getPinnedBus();
+        async function updateUI() {
+    const { overrides, extras } = await loadOverrides('to');
+    const busData = applyOverrides(injikattKavalaData, overrides, extras);
 
-            // Build list and find next bus
-            injikattKavalaData.forEach((bus, index) => {
+    const now = new Date();
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+    let nextBusIndex = -1;
+    let listHTML = "";
+    const stopOffset = offsets[stop] || 0;
+    const pinnedBus = getPinnedBus();
+
+    // Build list and find next bus
+    busData.forEach((bus, index) => { 
                 let [t, n, p] = bus;
                 let [h, m] = t.split(':').map(Number);
                 let baseTotal;
