@@ -1,12 +1,12 @@
 // =============================================
-// BUS OVERRIDES LOADER
-// Include this in tothodupuzha.html and fromthodupuzha.html
-// It fetches overrides from Firebase and applies them
+// BUS OVERRIDES LOADER - SAFE VERSION
 // =============================================
 
 async function loadOverrides(route) {
     try {
         const res = await fetch(`${FIREBASE_URL}/nammadebus.json`);
+        if (!res.ok) return { overrides: {}, extras: [] };
+        
         const data = await res.json();
         if (!data) return { overrides: {}, extras: [] };
 
@@ -20,48 +20,46 @@ async function loadOverrides(route) {
 
         return { overrides, extras };
     } catch(e) {
-        console.warn('Could not load overrides:', e);
+        console.warn('Firebase overrides failed, using default data:', e);
         return { overrides: {}, extras: [] };
     }
 }
 
-// Apply overrides to bus data array
-// Returns filtered + modified bus array
 function applyOverrides(busData, overrides, extras) {
-    const today = new Date().getDay(); // 0=Sun, 6=Sat
-    let result = [...busData, ...extras];
+    try {
+        const today = new Date().getDay();
+        let result = [...busData];
 
-    result = result.map((bus, i) => {
-        const ov = overrides[i] || {};
-
-        // Apply permanent edits
-        let name = ov.permanentName || bus[1];
-        let time = ov.permanentTime || bus[0];
-        let period = bus[2];
-
-        // Apply today's replacement
-        if (ov.status === 'replaced' && ov.replacedBy) {
-            name = ov.replacedBy;
-            if (ov.newTime) time = ov.newTime;
+        if (Array.isArray(extras) && extras.length > 0) {
+            result = [...result, ...extras];
         }
 
-        return [time, name, period, i, ov];
-    });
+        result = result.map((bus, i) => {
+            const ov = overrides[String(i)] || {};
 
-    // Filter out cancelled and day-disabled buses
-    result = result.filter((bus) => {
-        const ov = bus[4] || {};
-        const originalIndex = bus[3];
+            let name = ov.permanentName || bus[1];
+            let time = ov.permanentTime || bus[0];
+            let period = bus[2];
 
-        // Hide if cancelled today
-        if (ov.status === 'cancelled') return false;
+            if (ov.status === 'replaced' && ov.replacedBy) {
+                name = ov.replacedBy;
+                if (ov.newTime) time = ov.newTime;
+            }
 
-        // Hide if disabled on today's day
-        if (ov.disabledDays && ov.disabledDays.includes(today)) return false;
+            return [time, name, period, i, ov];
+        });
 
-        return true;
-    });
+        result = result.filter((bus) => {
+            const ov = bus[4] || {};
+            if (ov.status === 'cancelled') return false;
+            if (ov.disabledDays && Array.isArray(ov.disabledDays) && ov.disabledDays.includes(today)) return false;
+            return true;
+        });
 
-    // Clean up — return [time, name, period] format
-    return result.map(bus => [bus[0], bus[1], bus[2]]);
+        return result.map(bus => [bus[0], bus[1], bus[2]]);
+
+    } catch(e) {
+        console.warn('applyOverrides failed, using original data:', e);
+        return busData;
+    }
 }
