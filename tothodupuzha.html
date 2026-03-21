@@ -1036,4 +1036,11 @@
 
         // Close modals when clicking backdrop
         document.getElementById('gpay-modal').addEventListener('click', function(e) { if (e.target === this) closeDonationModal(); });
-        document.getElementById('about-modal').addEventListener('click', function(e) { if (e.target 
+        document.getElementById('about-modal').addEventListener('click', function(e) { if (e.target === this) closeAboutModal(); });
+        document.getElementById('pinned-modal').addEventListener('click', function(e) { if (e.target === this) closePinnedModal(); });
+
+        updateUI();
+        setInterval(updateUI, 30000);
+    </script>
+</body>
+    </html>
