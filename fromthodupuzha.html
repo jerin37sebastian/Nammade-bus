@@ -6,6 +6,8 @@
     <title>To Poomala - Schedule</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2979ff">
+    <script src="firebase-config.js"></script>
+<script src="bus-overrides.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -765,15 +767,21 @@
         }
 
         // ===== UPDATE UI =====
-        function updateUI() {
-            const now = new Date();
-            const currentMins = now.getHours() * 60 + now.getMinutes();
-            let nextBusIndex = -1;
-            let listHTML = "";
-            const stopOffset = offsets[stop] || 0;
-            const pinnedBus = getPinnedBus();
+        
+            async function updateUI() {
+    const { overrides, extras } = await loadOverrides('from');
+    const busData = applyOverrides(injikattKavalaData, overrides, extras);
 
-            injikattKavalaData.forEach((bus, index) => {
+    const now = new Date();
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+    let nextBusIndex = -1;
+    let listHTML = "";
+    const stopOffset = offsets[stop] || 0;
+    const pinnedBus = getPinnedBus();
+
+    // Build list and find next bus
+    busData.forEach((bus, index) => {
+        
                 let [t, n, p] = bus;
                 let [h, m] = t.split(':').map(Number);
                 let baseTotal;
