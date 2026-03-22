@@ -278,6 +278,49 @@
         .upi-note {
             font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px;
         }
+        /* UPDATE POPUP */
+.update-popup {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a3a5f;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    z-index: 9999;
+    width: 90%;
+    max-width: 380px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(66,165,245,0.3);
+}
+.update-popup.show { display: flex; }
+.update-popup-text { font-size: 0.85rem; font-weight: 600; flex: 1; }
+.update-popup-btn {
+    background: #2979ff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.update-close {
+    background: none;
+    border: none;
+    color: #90caf9;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
     </style>
 </head>
 <body>
@@ -450,6 +493,12 @@
             </div>
         </div>
     </div>
+    <div class="update-popup" id="update-popup">
+    <div class="update-popup-text">🚀 New update available!</div>
+    <button class="update-popup-btn" onclick="applyUpdate()">Update</button>
+    <button class="update-close" onclick="dismissUpdate()">✕</button>
+</div>
+
 
     <script>
         // DARK MODE - WITH IMAGES
@@ -656,14 +705,51 @@ function installApp() {
         console.log('Nammade Bus - Index loaded successfully');
         console.log('Theme:', document.documentElement.getAttribute('data-theme'));
 
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/Nammade-bus/sw.js')
-                    .then(() => console.log('SW registered'))
-                    .catch(err => console.log('SW failed:', err));
-            });
-        }
+        
+        // Service Worker registration + Update detection
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Nammade-bus/sw.js')
+            .then(reg => {
+                console.log('SW registered');
+
+                // Check for updates every 60 seconds
+                setInterval(() => reg.update(), 60000);
+
+                // New SW waiting — show update popup
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdatePopup();
+                        }
+                    });
+                });
+            })
+            .catch(err => console.log('SW failed:', err));
+
+        // SW sent APP_UPDATED message
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'APP_UPDATED') {
+                showUpdatePopup();
+            }
+        });
+    });
+}
+
+function showUpdatePopup() {
+    document.getElementById('update-popup').classList.add('show');
+}
+
+function applyUpdate() {
+    document.getElementById('update-popup').classList.remove('show');
+    window.location.reload(true); // Force reload from server
+}
+
+function dismissUpdate() {
+    document.getElementById('update-popup').classList.remove('show');
+}
+
             </script>
 </body>
 </html>
