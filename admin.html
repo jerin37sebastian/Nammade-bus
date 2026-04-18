@@ -586,28 +586,39 @@
 
     // ===== FIREBASE =====
     async function firebaseGet(path) {
-        try {
-            const res = await fetch(`${FIREBASE_URL}/${path}.json`);
-            return await res.json();
-        } catch(e) {
-            showToast('⚠️ Firebase error: ' + e.message);
-            return null;
-        }
+    try {
+        // ADD THESE 3 LINES ↓
+        const url = authToken 
+            ? `${FIREBASE_URL}/${path}.json?auth=${authToken}`
+            : `${FIREBASE_URL}/${path}.json`;
+        // CHANGE THIS LINE ↓ (was: const res = await fetch(`${FIREBASE_URL}/${path}.json`);)
+        const res = await fetch(url);
+        return await res.json();
+    } catch(e) {
+        showToast('⚠️ Firebase error: ' + e.message);
+        return null;
+    }
     }
 
     async function firebaseSet(path, data) {
-        try {
-            await fetch(`${FIREBASE_URL}/${path}.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            return true;
-        } catch(e) {
-            showToast('⚠️ Save failed: ' + e.message);
-            return false;
-        }
+    try {
+        // ADD THESE 3 LINES ↓
+        const url = authToken 
+            ? `${FIREBASE_URL}/${path}.json?auth=${authToken}`
+            : `${FIREBASE_URL}/${path}.json`;
+        // CHANGE THIS LINE ↓ (was: await fetch(`${FIREBASE_URL}/${path}.json`, {)
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return true;
+    } catch(e) {
+        showToast('⚠️ Save failed: ' + e.message);
+        return false;
     }
+    }
+    
 
     // ===== LOAD DATA =====
     async function loadAllData() {
