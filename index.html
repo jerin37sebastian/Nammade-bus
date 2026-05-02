@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nammade Bus - Home</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2979ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="firebase-config.js"></script>
+    <meta name="apple-mobile-web-app-title" content="Nammade Bus">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* LIGHT & DARK MODE VARIABLES */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --text-primary: #1a1a1a;
+            --text-secondary: #5f6368;
+            --text-accent: #0d47a1;
+            --accent-blue: #2979ff;
+            --particle-color: rgba(41, 121, 255, 0.4);
+            --input-bg: #f1f3f4;
+            --border-color: rgba(41, 121, 255, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0a1929;
+            --bg-card: rgba(13, 27, 42, 0.8);
+            --text-primary: #e3f2fd;
+            --text-secondary: #90caf9;
+            --text-accent: #64b5f6;
+            --accent-blue: #42a5f5;
+            --particle-color: rgba(66, 165, 245, 0.6);
+            --input-bg: #1e3a5f;
+            --border-color: rgba(66, 165, 245, 0.3);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .splash-logo {
+            width: 80px; height: 80px; background: var(--accent-blue);
+            border-radius: 22px; display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 10px 30px rgba(41, 121, 255, 0.3);
+            margin-bottom: 20px; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .splash-text { font-weight: 800; font-size: 1.5rem; color: var(--text-accent); letter-spacing: 2px; }
+
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        
+        .main-card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(10px); 
+            padding: 30px; 
+            border-radius: 40px; 
+            border: 1px solid var(--border-color); 
+            text-align: center; 
+            width: 92%; 
+            max-width: 400px; 
+            box-shadow: 0 20px 60px rgba(41, 121, 255, 0.15); 
+            position: relative; 
+            z-index: 1;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+        
+        h1 { font-weight: 800; letter-spacing: 2px; margin-bottom: 5px; font-size: 1.8rem; color: var(--text-accent); }
+        .subtitle { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
+        
+        .select-label { font-size: 0.65rem; font-weight: 800; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 5px; display: block; letter-spacing: 1px;}
+        select { 
+            width: 100%; padding: 16px; background: var(--input-bg); border: 2px solid transparent; 
+            color: var(--text-primary); border-radius: 18px; outline: none; font-size: 1rem; 
+            font-weight: 700; transition: 0.3s; text-align-last: center;
+        }
+        select:focus { border-color: var(--accent-blue); background: var(--bg-card); }
+        
+        .flip-btn-container { margin: 10px 0; position: relative; height: 30px; }
+        .btn-flip {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--accent-blue); color: white; border: 4px solid var(--bg-primary);
+            width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3); z-index: 2;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .btn-flip:active { transform: translate(-50%, -50%) scale(0.9) rotate(180deg); }
+
+        .btn-main { 
+            display: block; width: 100%; padding: 20px; margin-top: 20px; border-radius: 20px; 
+            border: none; background: var(--accent-blue); color: white; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(41, 121, 255, 0.3); transition: 0.3s;
+        }
+        .btn-main:active { transform: scale(0.97); }
+        
+        .disclaimer { font-size: 0.65rem; color: var(--text-secondary); margin-top: 20px; line-height: 1.4; font-style: italic; }
+        
+        /* HAMBURGER MENU BUTTON */
+        .menu-btn {
+            position: fixed; top: 20px; left: 20px; width: 50px; height: 50px;
+            background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease; border: none;
+        }
+        .menu-btn:active { transform: scale(0.9); }
+        .menu-icon { font-size: 1.5rem; color: var(--text-primary); }
+        
+        /* DARK MODE TOGGLE */
+        .theme-toggle {
+            position: fixed; top: 20px; right: 20px; width: 50px; height: 50px;
+            background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease; overflow: hidden; border: none;
+        }
+        .theme-toggle:active { transform: scale(0.9) rotate(180deg); }
+        .theme-img { width: 26px; height: 26px; object-fit: contain; }
+
+        /* SIDE MENU - FIXED */
+        .side-menu {
+            position: fixed; top: 0; left: -100%; width: 280px; height: 100vh;
+            background: var(--bg-primary); z-index: 300;
+            transition: left 0.3s ease; box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+        .side-menu.open { left: 0; }
+        
+        .menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0,0,0,0.5); z-index: 200;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .menu-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .menu-title {
+            font-size: 1.5rem; font-weight: 800; color: var(--text-accent);
+        }
+        
+        .menu-items { padding: 10px 0; }
+        .menu-item {
+            padding: 18px 25px; display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .menu-item:hover { background: rgba(41, 121, 255, 0.05); }
+        .menu-item-img { width: 26px; height: 26px; object-fit: contain; }
+        .menu-item-text { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+
+        /* MODALS */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; align-items: center;
+            justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal.show { display: flex; }
+        
+        .modal-content {
+            background: var(--bg-primary); border-radius: 25px; padding: 30px 25px;
+            max-width: 450px; width: 90%; max-height: 85vh; overflow-y: auto;
+            position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            font-size: 2rem; color: var(--text-secondary); cursor: pointer; line-height: 1;
+        }
+        
+        .modal-title {
+            font-size: 1.6rem; font-weight: 800; color: var(--text-accent);
+            margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+        }
+        
+        .version-badge {
+            background: var(--accent-blue); color: white; padding: 4px 12px;
+            border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+        }
+        
+        .modal-section {
+            margin: 25px 0; padding: 20px 0; border-bottom: 1px solid var(--border-color);
+        }
+        .modal-section:last-child { border-bottom: none; }
+        
+        .section-title {
+            font-weight: 700; color: var(--text-accent); margin-bottom: 12px; font-size: 1.05rem;
+        }
+        
+        .section-text {
+            color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem;
+        }
+        
+        .contact-link {
+            display: block; padding: 12px 15px; background: rgba(41, 121, 255, 0.05);
+            border-radius: 12px; margin: 8px 0; text-decoration: none; color: var(--accent-blue);
+            font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
+        }
+        .contact-link:hover {
+            background: rgba(41, 121, 255, 0.1); transform: translateX(5px);
+        }
+
+        /* DONATION MODAL */
+        .gpay-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .gpay-modal.show { display: flex; }
+        .gpay-content {
+            background: var(--bg-primary); border-radius: 30px; padding: 30px;
+            max-width: 400px; width: 90%; text-align: center; position: relative;
+        }
+        .gpay-close {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            font-size: 2rem; color: var(--text-secondary); cursor: pointer;
+        }
+        .gpay-title {
+            font-size: 1.5rem; font-weight: 800; color: var(--text-accent); margin-bottom: 15px;
+        }
+        .gpay-subtitle {
+            font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;
+        }
+        .gpay-qr {
+            width: 250px; height: 250px; background: #f1f3f4; border-radius: 20px;
+            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+            color: #9aa0a6; font-weight: 600;
+        }
+        [data-theme="dark"] .gpay-qr { background: var(--input-bg); }
+        .gpay-qr img {
+            width: 100%; height: 100%; object-fit: contain; border-radius: 20px;
+        }
+        .upi-section {
+            margin: 20px 0; padding: 15px; background: rgba(0,200,83,0.1);
+            border-radius: 15px; border: 2px solid rgba(0,200,83,0.3);
+        }
+        .upi-label {
+            font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .upi-id {
+            font-weight: 800; color: var(--text-accent); font-size: 1rem;
+            margin-bottom: 12px; word-break: break-all;
+        }
+        .copy-upi-btn {
+            background: linear-gradient(135deg, #00c853, #00e676); color: white; border: none;
+            padding: 14px 28px; border-radius: 20px; font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(0,200,83,0.3);
+            transition: transform 0.2s;
+        }
+        .copy-upi-btn:active { transform: scale(0.98); }
+        .upi-note {
+            font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px;
+        }
+        /* ANNOUNCEMENT POPUP */
+        .announcement-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .announcement-overlay.show { display: flex; }
+        .announcement-box {
+            background: var(--bg-primary);
+            border-radius: 28px;
+            padding: 30px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .announcement-icon {
+            font-size: 3rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+        .announcement-type {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+        .type-hartal { background: rgba(244,67,54,0.15); color: #f44336; }
+        .type-strike { background: rgba(255,152,0,0.15); color: #ff9800; }
+        .type-flood  { background: rgba(33,150,243,0.15); color: #2196f3; }
+        .type-maintenance { background: rgba(156,39,176,0.15); color: #9c27b0; }
+        .type-announcement { background: rgba(41,121,255,0.15); color: #2979ff; }
+        .announcement-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-accent);
+            margin-bottom: 12px;
+        }
+        .announcement-message {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .announcement-expiry {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .announcement-dismiss {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .announcement-dismiss:active { transform: scale(0.97); }
+    </style>
+</head>
+<body>
+    <div id="splash-screen">
+        <div class="splash-logo">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M9 20l1-4"/><path d="M14 16l1 4"/><path d="M8 8h.01"/><path d="M16 8h.01"/></svg>
+        </div>
+        <div class="splash-text">NAMMADE BUS</div>
+    </div>
+
+    <!-- MENU OVERLAY - MUST BE BEFORE MENU -->
+    <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <div class="menu-title">☰ Menu</div>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item" onclick="openDonationModal()">
+                <img src="donation.png" alt="Donate" class="menu-item-img" onerror="this.style.display='none'; this.nextElementSibling.style.marginLeft='0';">
+                <span class="menu-item-text">Support Developer</span>
+            </div>
+            <div class="menu-item" onclick="shareApp()">
+                <img src="share.png" alt="Share" class="menu-item-img" onerror="this.style.display='none'; this.nextElementSibling.style.marginLeft='0';">
+                <span class="menu-item-text">Share Nammade Bus</span>
+            </div>
+            <div class="menu-item" onclick="openAboutModal()">
+                <span style="font-size: 1.3rem;">ℹ️</span>
+                <span class="menu-item-text">About This App</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HAMBURGER MENU BUTTON -->
+    <button class="menu-btn" onclick="openMenu()" aria-label="Open menu">
+        <span class="menu-icon">☰</span>
+    </button>
+
+    <!-- THEME TOGGLE WITH IMAGE -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <img src="theme-dark.png" alt="Theme" class="theme-img" id="theme-icon" onerror="this.style.display='none';">
+    </button>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="main-card">
+        <h1>Nammade Bus</h1>
+        <div class="subtitle">Community Travel</div>
+        
+        <span class="select-label">From (Start Point)</span>
+        <select id="stopSelect">
+            <option value="Poomala">Poomala</option>
+            <option value="Injikatt Kavala" selected>Injikatt Kavala</option>
+            <option value="Pannimattom">Pannimattom</option>
+            <option value="Karukapally Kavala">Karukapally Kavala</option>
+            <option value="Elamdhesham">Elamdhesham</option>
+            <option value="Elamdhesham School">Elamdhesham School</option>
+            <option value="Kalayanthani">Kalayanthani</option>
+            <option value="Alacode">Alacode</option>
+            <option value="Meenmutty">Meenmutty</option>
+            <option value="Edavetty">Edavetty</option>
+            <option value="Edavetty Jaram">Edavetty Jaram</option>
+            <option value="Kumbakallu">Kumbakallu</option>
+            <option value="Thodupuzha Stand">Thodupuzha Stand</option>
+        </select>
+
+        <div class="flip-btn-container">
+            <button class="btn-flip" onclick="flipLocations()">⇅</button>
+        </div>
+
+        <span class="select-label">To (Destination)</span>
+        <select id="destSelect">
+            <option value="Poomala">Poomala</option>
+            <option value="Injikatt Kavala">Injikatt Kavala</option>
+            <option value="Pannimattom">Pannimattom</option>
+            <option value="Karukapally Kavala">Karukapally Kavala</option>
+            <option value="Elamdhesham">Elamdhesham</option>
+            <option value="Elamdhesham School">Elamdhesham School</option>
+            <option value="Kalayanthani">Kalayanthani</option>
+            <option value="Alacode">Alacode</option>
+            <option value="Meenmutty">Meenmutty</option>
+            <option value="Edavetty">Edavetty</option>
+            <option value="Edavetty Jaram">Edavetty Jaram</option>
+            <option value="Kumbakallu">Kumbakallu</option>
+            <option value="Thodupuzha Stand" selected>Thodupuzha Stand</option>
+        </select>
+        
+        <button class="btn-main" onclick="calculateJourney()">Start Journey</button>
+
+        <div class="disclaimer">
+            * Schedules are approximate. May change due to traffic and weather condition.
+        </div>
+    </div>
+
+    <!-- ABOUT MODAL -->
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAboutModal()">×</button>
+            
+            <div class="modal-title">
+                ℹ️ About Nammade Bus
+                <span class="version-badge">v1.0</span>
+            </div>
+
+            <div class="modal-section">
+                <div class="section-title">📱 Route Coverage</div>
+                <div class="section-text">
+                    Currently serving the Poomala-Thodupuzha route. Additional routes coming soon.
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="section-title">🎯 Our Mission</div>
+                <div class="section-text">
+                    Nammade Bus helps commuters track real-time bus schedules and plan their journeys efficiently.
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="section-title">📧 Contact</div>
+                <a href="https://www.instagram.com/jerin_sebastian007?igsh=ZGV4eXJicWVlcWlr" target="_blank" class="contact-link">
+                    📷 Instagram: @jerin_sebastian007
+                </a>
+                <a href="https://www.linkedin.com/in/jerin-sebastian-680141374?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="contact-link">
+                    💼 LinkedIn: Jerin Sebastian
+                </a>
+                <a href="mailto:jerin37sebastian@gmail.com" class="contact-link">
+                    ✉️ Email: jerin37sebastian@gmail.com
+                </a>
+            </div>
+
+            <div class="modal-section">
+                <div class="section-title">💬 Feedback</div>
+                <div class="section-text">
+                    For suggestions, feedback, or business inquiries, please reach out.
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="section-text" style="text-align: center; font-weight: 600;">
+                    Thank you for using Nammade Bus.<br>Your support helps us improve!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DONATION MODAL -->
+    <div class="gpay-modal" id="gpay-modal">
+        <div class="gpay-content">
+            <button class="gpay-close" onclick="closeDonationModal()">×</button>
+            <div class="gpay-title">☕ Support Nammade Bus</div>
+            <div class="gpay-subtitle">💡 Scan QR or Copy UPI ID to pay</div>
+            
+            <div class="gpay-qr">
+                <img src="GPAYQR.png" alt="GPay QR Code" onerror="this.parentElement.innerHTML='<div>Scan with<br>GPay / PhonePe<br>to donate</div>'">
+            </div>
+            
+            <div class="upi-section">
+                <div class="upi-label">Or Pay with UPI ID</div>
+                <div class="upi-id">jerin17sebastian@okhdfcbank</div>
+                <button class="copy-upi-btn" onclick="copyUpiId()">
+                    📋 Copy UPI ID
+                </button>
+                <div class="upi-note">Paste in GPay/PhonePe to pay any amount</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DARK MODE - WITH IMAGES
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setTheme(prefersDark ? 'dark' : 'light');
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) setTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) {
+                // Light mode shows MOON icon (theme-dark.png), Dark mode shows SUN icon (theme-light.png)
+                if (theme === 'dark') {
+                    themeIcon.src = 'theme-light.png'; // Sun icon to go to light mode
+                } else {
+                    themeIcon.src = 'theme-dark.png'; // Moon icon to go to dark mode
+                }
+            }
+            const metaTag = document.querySelector('meta[name="theme-color"]');
+            if (metaTag) {
+                metaTag.setAttribute('content', theme === 'dark' ? '#0a1929' : '#2979ff');
+            }
+        }
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        initTheme();
+
+        // MENU - FIXED
+        function openMenu() {
+            document.getElementById('side-menu').classList.add('open');
+            document.getElementById('menu-overlay').classList.add('show');
+            console.log('Menu opened');
+        }
+        
+        function closeMenu() {
+            document.getElementById('side-menu').classList.remove('open');
+            document.getElementById('menu-overlay').classList.remove('show');
+            console.log('Menu closed');
+        }
+
+        // ABOUT MODAL
+        function openAboutModal() {
+            closeMenu();
+            document.getElementById('about-modal').classList.add('show');
+        }
+        
+        function closeAboutModal() {
+            document.getElementById('about-modal').classList.remove('show');
+        }
+
+        // DONATION MODAL
+        function openDonationModal() {
+            closeMenu();
+            document.getElementById('gpay-modal').classList.add('show');
+        }
+        
+        function closeDonationModal() {
+            document.getElementById('gpay-modal').classList.remove('show');
+        }
+        
+        function copyUpiId() {
+            const upiId = 'jerin17sebastian@okhdfcbank';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(upiId).then(() => {
+                    alert('✅ UPI ID copied!\n\n' + upiId + '\n\nPaste in your UPI app to pay.');
+                }).catch(() => {
+                    alert('UPI ID: ' + upiId + '\n\nPlease copy manually.');
+                });
+            } else {
+                alert('UPI ID: ' + upiId + '\n\nPlease copy manually.');
+            }
+        }
+
+        // SHARE APP
+        function shareApp() {
+            closeMenu();
+            const message = '🚌 Track buses easily on the Poomala-Thodupuzha route!\n\nTry Nammade Bus: ' + window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Nammade Bus',
+                    text: message
+                }).catch((err) => {
+                    console.log('Share failed:', err);
+                });
+            } else {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(message).then(() => {
+                        alert('✅ Link copied! Share it with friends.');
+                    });
+                } else {
+                    alert('Share: ' + message);
+                }
+            }
+        }
+
+        // SPLASH
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splash-screen');
+            if (sessionStorage.getItem('splashShown')) {
+                splash.style.display = 'none';
+            } else {
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => {
+                        splash.style.visibility = 'hidden';
+                        sessionStorage.setItem('splashShown', 'true');
+                    }, 500);
+                }, 800);
+            }
+        });
+
+        function flipLocations() {
+            const start = document.getElementById('stopSelect');
+            const dest = document.getElementById('destSelect');
+            const temp = start.value;
+            start.value = dest.value;
+            dest.value = temp;
+        }
+
+        const routeOrder = ["Poomala", "Injikatt Kavala", "Pannimattom", "Karukapally Kavala", "Elamdhesham", "Elamdhesham School", "Kalayanthani", "Alacode", "Meenmutty", "Edavetty", "Edavetty Jaram", "Kumbakallu", "Thodupuzha Stand"];
+        
+        function calculateJourney() {
+            const start = document.getElementById('stopSelect').value;
+            const end = document.getElementById('destSelect').value;
+            if (start === end) { alert("Please select a different destination!"); return; }
+            localStorage.setItem('selectedStopName', start);
+            localStorage.setItem('userDestination', end);
+            const startIndex = routeOrder.indexOf(start);
+            const endIndex = routeOrder.indexOf(end);
+            if (endIndex > startIndex) {
+                window.location.href = "tothodupuzha.html";
+            } else {
+                window.location.href = "fromthodupuzha.html";
+            }
+        }
+
+        // PARTICLES
+        const canvas = document.getElementById('particleCanvas'); 
+        const ctx = canvas.getContext('2d'); 
+        let particles = [];
+        function init() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            particles = []; 
+            for(let i=0; i<60; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1, sp: Math.random()*0.3+0.1, o: Math.random()*0.4+0.1});
+        }
+        function draw() { 
+            ctx.clearRect(0,0,canvas.width,canvas.height); 
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            particles.forEach(p => { 
+                p.y -= p.sp; 
+                if(p.y<0) p.y=canvas.height; 
+                ctx.fillStyle = isDark ? `rgba(66, 165, 245, ${p.o * 1.5})` : `rgba(41, 121, 255, ${p.o})`;
+                ctx.beginPath(); 
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); 
+                ctx.fill(); 
+            }); 
+            requestAnimationFrame(draw); 
+        }
+        window.onresize = init; init(); draw();
+        
+        // PWA INSTALL
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                if (confirm('📱 Install Nammade Bus as an app for quick access?')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                }
+            }, 3000);
+        });
+        
+        // Debug console messages
+        console.log('Nammade Bus - Index loaded successfully');
+        console.log('Theme:', document.documentElement.getAttribute('data-theme'));
+
+        // ===== ANNOUNCEMENT POPUP =====
+        const typeIcons = {
+            hartal: '🔴',
+            strike: '⚠️',
+            flood: '🌊',
+            maintenance: '🔧',
+            announcement: '📢'
+        };
+        const typeLabels = {
+            hartal: 'Hartal Alert',
+            strike: 'Strike Alert',
+            flood: 'Flood Alert',
+            maintenance: 'Maintenance',
+            announcement: 'Announcement'
+        };
+
+        async function checkAnnouncement() {
+            try {
+                const res = await fetch(`${FIREBASE_URL}/globalAlert.json`);
+                if (!res.ok) return;
+                const alert = await res.json();
+                if (!alert || !alert.active || !alert.message) return;
+
+                // Check expiry
+                if (alert.expiresAt) {
+                    const expiry = new Date(alert.expiresAt);
+                    if (new Date() > expiry) return; // Expired
+                }
+
+                // Check if user already dismissed this alert today
+                const dismissedKey = `dismissed_alert_${alert.createdAt}`;
+                if (localStorage.getItem(dismissedKey)) return;
+
+                // Show popup
+                showAnnouncementPopup(alert, dismissedKey);
+            } catch(e) {
+                console.warn('Could not load announcement:', e);
+            }
+        }
+
+        function showAnnouncementPopup(alert, dismissedKey) {
+            const type = alert.type || 'announcement';
+            const icon = typeIcons[type] || '📢';
+            const label = typeLabels[type] || 'Announcement';
+
+            let expiryText = '';
+            if (alert.expiresAt) {
+                const d = new Date(alert.expiresAt);
+                expiryText = `Valid until: ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            } else {
+                expiryText = 'Until further notice';
+            }
+
+            document.getElementById('announcement-icon').textContent = icon;
+            document.getElementById('announcement-type').textContent = label;
+            document.getElementById('announcement-type').className = `announcement-type type-${type}`;
+            document.getElementById('announcement-title').textContent = label;
+            document.getElementById('announcement-message').textContent = alert.message;
+            document.getElementById('announcement-expiry').textContent = expiryText;
+
+            // Store dismiss key for the button
+            document.getElementById('announcement-dismiss-btn').onclick = () => {
+                localStorage.setItem(dismissedKey, '1');
+                document.getElementById('announcement-overlay').classList.remove('show');
+            };
+
+            document.getElementById('announcement-overlay').classList.add('show');
+        }
+
+        // Check announcement on page load
+        checkAnnouncement();
+    </script>
+
+    <!-- ANNOUNCEMENT POPUP -->
+    <div class="announcement-overlay" id="announcement-overlay">
+        <div class="announcement-box">
+            <span class="announcement-icon" id="announcement-icon">📢</span>
+            <div class="announcement-type" id="announcement-type">Alert</div>
+            <div class="announcement-title" id="announcement-title">Important Notice</div>
+            <div class="announcement-message" id="announcement-message"></div>
+            <div class="announcement-expiry" id="announcement-expiry"></div>
+            <button class="announcement-dismiss" id="announcement-dismiss-btn">Got it, thanks! 👍</button>
+        </div>
+    </div>
+</body>
+</html>

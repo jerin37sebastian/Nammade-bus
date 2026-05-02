@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nammade Bus — Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a1929;
+            --card: #0d2137;
+            --card2: #112844;
+            --blue: #2979ff;
+            --green: #00c853;
+            --red: #f44336;
+            --yellow: #FFD700;
+            --orange: #ff9800;
+            --text: #e3f2fd;
+            --sub: #7fa8c9;
+            --border: rgba(66,165,245,0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ===== LOGIN ===== */
+        #login-screen {
+            position: fixed; inset: 0;
+            background: var(--bg);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 999; gap: 20px; padding: 30px;
+        }
+        .login-logo {
+            width: 70px; height: 70px;
+            background: var(--blue);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin-bottom: 10px;
+        }
+        .login-title { font-size: 1.6rem; font-weight: 800; color: var(--text); }
+        .login-sub { font-size: 0.85rem; color: var(--sub); margin-bottom: 10px; }
+        #password-input {
+            width: 100%; max-width: 340px;
+            padding: 16px 20px;
+            background: var(--card2);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+        #password-input:focus { border-color: var(--blue); }
+        .login-btn {
+            width: 100%; max-width: 340px;
+            padding: 16px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-error {
+            color: var(--red);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* ===== MAIN APP ===== */
+        #app { display: none; padding-bottom: 40px; }
+
+        .top-bar {
+            background: var(--card);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .top-bar-title { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+        .top-bar-sub { font-size: 0.72rem; color: var(--sub); margin-top: 2px; }
+        .logout-btn {
+            background: rgba(244,67,54,0.15);
+            color: var(--red);
+            border: 1px solid rgba(244,67,54,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--sub);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+        /* ===== CONTENT ===== */
+        .tab-content { display: none; padding: 15px; }
+        .tab-content.active { display: block; }
+
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .status-text { font-size: 0.82rem; color: var(--sub); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .save-all-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .save-all-btn:active { transform: scale(0.97); }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 20px 0 10px;
+        }
+
+        /* ===== BUS CARD ===== */
+        .bus-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border 0.2s;
+        }
+        .bus-card.cancelled { border-color: rgba(244,67,54,0.5); }
+        .bus-card.replaced { border-color: rgba(255,152,0,0.5); }
+        .bus-card.day-disabled { border-color: rgba(255,215,0,0.4); }
+
+        .bus-card-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .bus-index {
+            width: 32px; height: 32px;
+            background: rgba(41,121,255,0.15);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--blue);
+            flex-shrink: 0;
+        }
+        .bus-info { flex: 1; }
+        .bus-name { font-weight: 800; font-size: 0.95rem; color: var(--text); }
+        .bus-time { font-size: 0.78rem; color: var(--sub); margin-top: 2px; }
+        .bus-status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .badge-running { background: rgba(0,200,83,0.15); color: var(--green); }
+        .badge-cancelled { background: rgba(244,67,54,0.15); color: var(--red); }
+        .badge-replaced { background: rgba(255,152,0,0.15); color: var(--orange); }
+        .badge-disabled { background: rgba(255,215,0,0.15); color: var(--yellow); }
+        .expand-arrow { color: var(--sub); font-size: 0.8rem; transition: transform 0.2s; }
+        .expand-arrow.open { transform: rotate(180deg); }
+
+        .bus-card-body {
+            display: none;
+            padding: 0 16px 16px;
+            border-top: 1px solid var(--border);
+        }
+        .bus-card-body.open { display: block; }
+
+        /* ===== CONTROLS ===== */
+        .control-row {
+            margin-top: 14px;
+        }
+        .control-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Status selector */
+        .status-selector {
+            display: flex;
+            gap: 8px;
+        }
+        .status-option {
+            flex: 1;
+            padding: 10px 6px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .status-option.active-running { border-color: var(--green); color: var(--green); background: rgba(0,200,83,0.1); }
+        .status-option.active-cancelled { border-color: var(--red); color: var(--red); background: rgba(244,67,54,0.1); }
+        .status-option.active-replaced { border-color: var(--orange); color: var(--orange); background: rgba(255,152,0,0.1); }
+
+        /* Replacement fields */
+        .replacement-fields { display: none; margin-top: 12px; gap: 10px; display: none; flex-direction: column; }
+        .replacement-fields.show { display: flex; }
+        .admin-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--card2);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+        }
+        .admin-input:focus { border-color: var(--blue); }
+
+        /* Days selector */
+        .days-selector {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .day-chip {
+            padding: 7px 12px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            color: var(--sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .day-chip.selected { border-color: var(--yellow); color: var(--yellow); background: rgba(255,215,0,0.1); }
+
+        /* Edit fields */
+        .edit-row { display: flex; gap: 10px; margin-top: 10px; }
+        .edit-row .admin-input { flex: 1; }
+
+        /* ===== ADD BUS SECTION ===== */
+        .add-bus-card {
+            background: var(--card);
+            border: 2px dashed var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .add-bus-title { font-weight: 800; color: var(--blue); margin-bottom: 15px; font-size: 0.95rem; }
+        .add-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .add-row .admin-input { flex: 1; min-width: 120px; }
+        .period-select {
+            padding: 12px 14px;
+            background: var(--card2);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+        }
+        .add-bus-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        /* ===== TOAST ===== */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a3a5f;
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ===== ALERT TAB ===== */
+        .alert-type-btn {
+            padding: 8px 14px; border-radius: 20px;
+            border: 1.5px solid var(--border); background: transparent;
+            color: var(--sub); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .alert-type-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(41,121,255,0.1); }
+        .quick-msg-btn {
+            width: 100%; padding: 10px 14px; background: var(--card2);
+            border: 1px solid var(--border); border-radius: 12px; color: var(--sub);
+            font-size: 0.78rem; font-weight: 600; cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .quick-msg-btn:hover { border-color: var(--blue); color: var(--text); }
+
+        /* ===== SUBMISSION CARDS ===== */
+        .submission-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 16px; margin-bottom: 12px;
+        }
+        .submission-card.pending { border-color: rgba(255,152,0,0.5); }
+        .submission-card.approved { border-color: rgba(0,200,83,0.5); }
+        .submission-card.rejected { border-color: rgba(244,67,54,0.3); opacity: 0.6; }
+        .submission-reg { font-size: 1.1rem; font-weight: 800; color: var(--text); letter-spacing: 2px; }
+        .submission-bus { font-size: 0.8rem; color: var(--sub); margin: 6px 0; }
+        .submission-time { font-size: 0.72rem; color: var(--sub); margin-bottom: 12px; }
+        .submission-actions { display: flex; gap: 8px; }
+        .approve-btn {
+            flex: 1; padding: 10px; background: rgba(0,200,83,0.15);
+            color: var(--green); border: 1px solid rgba(0,200,83,0.3);
+            border-radius: 12px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+        }
+        .reject-btn {
+            flex: 1; padding: 10px; background: rgba(244,67,54,0.1);
+            color: var(--red); border: 1px solid rgba(244,67,54,0.2);
+            border-radius: 12px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+        }
+        .login-input {
+            width: 100%; max-width: 340px; padding: 16px 20px;
+            background: var(--card2); border: 2px solid var(--border);
+            border-radius: 16px; color: var(--text); font-size: 1rem;
+            font-weight: 600; outline: none; text-align: center; margin-bottom: 0;
+        }
+        .login-input:focus { border-color: var(--blue); }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--sub);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+    <div class="login-logo">🚌</div>
+    <div class="login-title">Admin Panel</div>
+    <div class="login-sub">Nammade Bus — Management</div>
+    <input type="email" id="email-input" class="login-input" placeholder="Admin email" 
+        onkeydown="if(event.key==='Enter') document.getElementById('password-input').focus()">
+    <input type="password" id="password-input" class="login-input" placeholder="Password" 
+        onkeydown="if(event.key==='Enter') login()">
+    <button class="login-btn" onclick="login()">Login</button>
+    <div class="login-error" id="login-error"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+    <div class="top-bar">
+        <div>
+            <div class="top-bar-title">🚌 Nammade Bus Admin</div>
+            <div class="top-bar-sub" id="last-saved">Loading...</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="font-size:0.72rem; color:var(--sub);" id="admin-email"></div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('to', this)">→ To Thodupuzha</div>
+        <div class="tab" onclick="switchTab('from', this)">← From Thodupuzha</div>
+        <div class="tab" onclick="switchTab('submissions', this)">📬 Submissions <span id="pending-count" style="background:#f44336;color:white;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-left:4px;display:none;">0</span></div>
+        <div class="tab" onclick="switchTab('alert', this)">🚨 Alert</div>
+    </div>
+
+    <!-- TO THODUPUZHA TAB -->
+    <div class="tab-content active" id="tab-to">
+        <div class="status-bar">
+            <div><span class="status-dot"></span><span class="status-text">Firebase Connected</span></div>
+            <button class="save-all-btn" onclick="saveAll('to')">💾 Save All</button>
+        </div>
+        <div id="buses-to"><div class="loading">Loading buses...</div></div>
+        <div class="section-header">Add New Bus</div>
+        <div class="add-bus-card">
+            <div class="add-bus-title">➕ Add Bus to Route</div>
+            <div class="add-row">
+                <input class="admin-input" id="new-name-to" placeholder="Bus name (e.g. MEERAS)">
+            </div>
+            <div class="add-row">
+                <input class="admin-input" id="new-time-to" placeholder="Time (e.g. 7:20)">
+                <select class="period-select" id="new-period-to">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                </select>
+            </div>
+            <button class="add-bus-btn" onclick="addBus('to')">Add Bus</button>
+        </div>
+    </div>
+
+    <!-- FROM THODUPUZHA TAB -->
+    <div class="tab-content" id="tab-from">
+        <div class="status-bar">
+            <div><span class="status-dot"></span><span class="status-text">Firebase Connected</span></div>
+            <button class="save-all-btn" onclick="saveAll('from')">💾 Save All</button>
+        </div>
+        <div id="buses-from"><div class="loading">Loading buses...</div></div>
+        <div class="section-header">Add New Bus</div>
+        <div class="add-bus-card">
+            <div class="add-bus-title">➕ Add Bus to Route</div>
+            <div class="add-row">
+                <input class="admin-input" id="new-name-from" placeholder="Bus name (e.g. MEERAS)">
+            </div>
+            <div class="add-row">
+                <input class="admin-input" id="new-time-from" placeholder="Time (e.g. 7:30)">
+                <select class="period-select" id="new-period-from">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                </select>
+            </div>
+            <button class="add-bus-btn" onclick="addBus('from')">Add Bus</button>
+        </div>
+    </div>
+
+    <!-- ALERT TAB -->
+    <div class="tab-content" id="tab-alert">
+        <div class="status-bar">
+            <div><span class="status-dot"></span><span class="status-text">Global Alert System</span></div>
+            <button class="save-all-btn" onclick="saveAlert()">💾 Save Alert</button>
+        </div>
+
+        <!-- ALERT PREVIEW -->
+        <div id="current-alert-preview" style="display:none; margin-bottom:15px; padding:16px; border-radius:16px; border:2px solid rgba(244,67,54,0.4); background:rgba(244,67,54,0.08);">
+            <div style="font-size:0.7rem; font-weight:800; color:#f44336; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">🔴 ACTIVE ALERT</div>
+            <div id="current-alert-text" style="font-weight:700; color:var(--text); font-size:0.95rem;"></div>
+            <div id="current-alert-type" style="font-size:0.75rem; color:var(--sub); margin-top:6px;"></div>
+        </div>
+
+        <!-- ALERT TYPE -->
+        <div class="section-header">Alert Type</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:15px;">
+            <button class="alert-type-btn active" onclick="selectAlertType('hartal', this)">🔴 Hartal</button>
+            <button class="alert-type-btn" onclick="selectAlertType('strike', this)">⚠️ Strike</button>
+            <button class="alert-type-btn" onclick="selectAlertType('flood', this)">🌊 Flood</button>
+            <button class="alert-type-btn" onclick="selectAlertType('maintenance', this)">🔧 Maintenance</button>
+            <button class="alert-type-btn" onclick="selectAlertType('announcement', this)">📢 Announcement</button>
+        </div>
+
+        <!-- ALERT MESSAGE -->
+        <div class="section-header">Alert Message</div>
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:15px;">
+            <textarea id="alert-message" 
+                style="width:100%; background:var(--card2); border:1.5px solid var(--border); border-radius:12px; color:var(--text); font-size:0.9rem; font-weight:600; padding:12px; outline:none; resize:none; height:100px; font-family:sans-serif;"
+                placeholder="e.g. No bus service today due to Hartal. Service will resume tomorrow."></textarea>
+            
+            <!-- QUICK MESSAGES -->
+            <div style="margin-top:12px;">
+                <div style="font-size:0.7rem; font-weight:800; color:var(--sub); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Quick Messages</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <button class="quick-msg-btn" onclick="setQuickMsg('🔴 No bus service today due to Hartal. All buses are cancelled. Service will resume tomorrow.')">🔴 Hartal — No Service</button>
+                    <button class="quick-msg-btn" onclick="setQuickMsg('⚠️ Limited bus service today due to strike. Some buses may be cancelled.')">⚠️ Strike — Limited Service</button>
+                    <button class="quick-msg-btn" onclick="setQuickMsg('🌊 Bus service affected due to flooding on route. Please check before travelling.')">🌊 Flood — Route Affected</button>
+                    <button class="quick-msg-btn" onclick="setQuickMsg('✅ All buses are running normally today.')">✅ All Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERT DURATION -->
+        <div class="section-header">Show Alert Until</div>
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:15px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="alert-type-btn" onclick="setDuration('today', this)">Today Only</button>
+                <button class="alert-type-btn" onclick="setDuration('tomorrow', this)">Tomorrow</button>
+                <button class="alert-type-btn active" onclick="setDuration('manual', this)">Until I Clear It</button>
+            </div>
+        </div>
+
+        <!-- CLEAR ALERT -->
+        <button onclick="clearAlert()" style="width:100%; padding:14px; background:rgba(244,67,54,0.15); color:#f44336; border:1px solid rgba(244,67,54,0.3); border-radius:14px; font-weight:800; font-size:0.9rem; cursor:pointer;">
+            🗑️ Clear Active Alert
+        </button>
+    </div>
+    <div class="tab-content" id="tab-submissions">
+        <div class="status-bar">
+            <div><span class="status-dot"></span><span class="status-text" id="submissions-count">Loading submissions...</span></div>
+            <button class="save-all-btn" onclick="loadSubmissions()">🔄 Refresh</button>
+        </div>
+        <div id="submissions-list"><div class="loading">Loading submissions...</div></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script>
+    const ADMIN_PASSWORD = 'nammadebus2024'; // Keep as fallback
+
+    // ===== FIREBASE AUTH =====
+    async function login() {
+        const email = document.getElementById('email-input').value.trim();
+        const password = document.getElementById('password-input').value;
+
+        if (!email || !password) { showLoginError('Please enter email and password!'); return; }
+
+        try {
+            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, returnSecureToken: true })
+            });
+            const data = await res.json();
+
+            if (data.idToken) {
+                // Success!
+                authToken = data.idToken;
+                document.getElementById('admin-email').textContent = email;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                loadAllData();
+            } else {
+                const msg = data.error?.message || 'Login failed';
+                if (msg.includes('INVALID_PASSWORD') || msg.includes('EMAIL_NOT_FOUND')) {
+                    showLoginError('❌ Wrong email or password!');
+                } else {
+                    showLoginError('❌ ' + msg);
+                }
+            }
+        } catch(e) {
+            showLoginError('❌ Network error. Check connection.');
+        }
+    }
+
+    function showLoginError(msg) {
+        const el = document.getElementById('login-error');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('password-input').value = '';
+    }
+
+    function logout() {
+        authToken = null;
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('email-input').value = '';
+        document.getElementById('password-input').value = '';
+        document.getElementById('login-error').style.display = 'none';
+    }
+
+    let authToken = null;
+
+    // ===== BASE BUS DATA =====
+    // Bus data: [time, name, period, regNum]
+    const BASE_BUSES = {
+        to: [
+            ["5:50","NOAH","AM",""],["6:15","MARIYA","AM",""],["6:20","MARIYA","AM",""],
+            ["6:35","NOAH","AM",""],["6:45","MARIYA","AM",""],["7:05","LMS","AM",""],
+            ["7:20","MARIYA","AM",""],["7:30","THACHUPARAMBIL","AM",""],["7:40","NIBRAS","AM",""],
+            ["7:55","MARIYA","AM",""],["8:05","SULTHANA","AM",""],["8:21","NOAH","AM",""],
+            ["8:35","NOAH","AM",""],["8:49","MARIYA","AM",""],["9:05","MARIYA","AM",""],
+            ["9:22","MARIYA","AM",""],["9:35","NIBRAS","AM",""],["9:41","MARIYA","AM",""],
+            ["9:57","MARIYA","AM",""],["10:24","NOAH","AM",""],["10:40","NOAH","AM",""],
+            ["10:56","MARIYA","AM",""],["11:32","NIBRAS","AM",""],["11:40","MARIYA","AM",""],
+            ["11:49","MARIYA","AM",""],["11:57","MARIYA","AM",""],["12:15","MARIYA","PM",""],
+            ["12:30","SULTHANA","PM",""],["12:55","NOAH","PM",""],["1:05","NOAH","PM",""],
+            ["1:30","MARIYA","PM",""],["1:44","MARIYA","PM",""],["1:54","MARIYA","PM",""],
+            ["2:20","NIBRAS","PM",""],["2:34","MARIYA","PM",""],["2:41","MARIYA","PM",""],
+            ["2:50","NOAH","PM",""],["3:13","MARIYA","PM",""],["3:25","MARIYA","PM",""],
+            ["3:35","NOAH","PM",""],["3:54","MARIYA","PM",""],["4:21","NIBRAS","PM",""],
+            ["4:35","MARIYA","PM",""],["4:45","NOAH","PM",""],["4:53","MARIYA","PM",""],
+            ["5:05","MARIYA","PM",""],["5:20","SULTHANA","PM",""],["5:36","NOAH","PM",""],
+            ["5:52","MARIYA","PM",""],["6:05","MARIYA","PM",""]
+        ],
+        from: [
+            ["7:30","NOAH","AM",""],["7:45","MARIYA","AM",""],["8:05","MARIYA","AM",""],
+            ["8:15","NOAH","AM",""],["8:25","MARIYA","AM",""],["8:42","MARIYA","AM",""],
+            ["9:06","MARIYA","AM",""],["9:20","NIBRAS","AM",""],["9:35","MARIYA","AM",""],
+            ["10:04","NOAH","AM",""],["10:16","NOAH","AM",""],["10:30","MARIYA","AM",""],
+            ["11:00","MARIYA","AM",""],["11:16","NIBRAS","AM",""],["11:22","MARIYA","AM",""],
+            ["11:31","MARIYA","AM",""],["11:46","MARIYA","AM",""],["11:57","SULTHANA","AM",""],
+            ["12:07","NOAH","PM",""],["12:34","NOAH","PM",""],["12:55","MARIYA","PM",""],
+            ["1:05","MARIYA","PM",""],["1:21","MARIYA","PM",""],["1:35","MARIYA","PM",""],
+            ["1:45","NIBRAS","PM",""],["2:00","MARIYA","PM",""],["2:13","MARIYA","PM",""],
+            ["2:35","NOAH","PM",""],["2:50","MARIYA","PM",""],["3:15","NOAH","PM",""],
+            ["3:25","MARIYA","PM",""],["3:47","MARIYA","PM",""],["4:00","NIBRAS","PM",""],
+            ["4:15","MARIYA","PM",""],["4:19","MARIYA","PM",""],["4:30","NOAH","PM",""],
+            ["4:56","MARIYA","PM",""],["5:03","SULTHANA","PM",""],["5:16","NOAH","PM",""],
+            ["5:40","MARIYA","PM",""],["5:46","KSRTC","PM",""],["6:01","NIBRAS","PM",""],
+            ["6:19","MARIYA","PM",""],["6:27","MARIYA","PM",""],["6:35","MARIYA","PM",""],
+            ["7:00","NOAH","PM",""],["7:10","NOAH","PM",""],["7:32","MARIYA","PM",""],
+            ["7:44","MARIYA","PM",""],["7:53","LMS","PM",""],["8:09","MARIYA","PM",""],
+            ["8:40","THACHUPARAMBIL","PM",""],["9:15","SULTHANA","PM",""]
+        ]
+    };
+
+    const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    // Current state — overrides loaded from Firebase
+    let overrides = { to: {}, from: {} };
+    let extraBuses = { to: [], from: [] };
+
+    // ===== FIREBASE =====
+    async function firebaseGet(path) {
+        try {
+            const res = await fetch(`${FIREBASE_URL}/${path}.json`);
+            return await res.json();
+        } catch(e) {
+            showToast('⚠️ Firebase error: ' + e.message);
+            return null;
+        }
+    }
+
+    async function firebaseSet(path, data) {
+        try {
+            await fetch(`${FIREBASE_URL}/${path}.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return true;
+        } catch(e) {
+            showToast('⚠️ Save failed: ' + e.message);
+            return false;
+        }
+    }
+
+    // ===== GLOBAL ALERT SYSTEM =====
+    let selectedAlertType = 'hartal';
+    let selectedDuration = 'manual';
+
+    function selectAlertType(type, el) {
+        selectedAlertType = type;
+        document.querySelectorAll('.alert-type-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function setDuration(duration, el) {
+        selectedDuration = duration;
+        el.parentElement.querySelectorAll('.alert-type-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function setQuickMsg(msg) {
+        document.getElementById('alert-message').value = msg;
+    }
+
+    async function saveAlert() {
+        const message = document.getElementById('alert-message').value.trim();
+        if (!message) { showToast('⚠️ Please enter an alert message!'); return; }
+
+        const now = new Date();
+        let expiresAt = null;
+
+        if (selectedDuration === 'today') {
+            const end = new Date();
+            end.setHours(23, 59, 59, 0);
+            expiresAt = end.toISOString();
+        } else if (selectedDuration === 'tomorrow') {
+            const end = new Date();
+            end.setDate(end.getDate() + 1);
+            end.setHours(23, 59, 59, 0);
+            expiresAt = end.toISOString();
+        }
+
+        const alertData = {
+            active: true,
+            message: message,
+            type: selectedAlertType,
+            createdAt: now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+            expiresAt: expiresAt
+        };
+
+        const success = await firebaseSet('globalAlert', alertData);
+        if (success) {
+            showToast('✅ Alert saved! Users will see it when they open the app.');
+            loadAlertPreview();
+        }
+    }
+
+    async function clearAlert() {
+        const success = await firebaseSet('globalAlert', {
+            active: false, message: '', type: '', createdAt: '', expiresAt: null
+        });
+        if (success) {
+            showToast('✅ Alert cleared!');
+            document.getElementById('current-alert-preview').style.display = 'none';
+            document.getElementById('alert-message').value = '';
+        }
+    }
+
+    async function loadAlertPreview() {
+        const data = await firebaseGet('globalAlert');
+        if (data && data.active && data.message) {
+            document.getElementById('current-alert-preview').style.display = 'block';
+            document.getElementById('current-alert-text').textContent = data.message;
+            document.getElementById('current-alert-type').textContent =
+                `Type: ${data.type} · Created: ${data.createdAt}${data.expiresAt ? ' · Expires: ' + new Date(data.expiresAt).toLocaleDateString('en-IN') : ' · No expiry'}`;
+        } else {
+            document.getElementById('current-alert-preview').style.display = 'none';
+        }
+    }
+
+    // ===== LOAD DATA =====
+    async function loadAllData() {
+        const data = await firebaseGet('nammadebus');
+        if (data) {
+            overrides.to = data.overrides_to || {};
+            overrides.from = data.overrides_from || {};
+            extraBuses.to = data.extra_to || [];
+            extraBuses.from = data.extra_from || [];
+            const lastSaved = data.last_saved || 'Never';
+            document.getElementById('last-saved').textContent = 'Last saved: ' + lastSaved;
+        }
+        renderBuses('to');
+        renderBuses('from');
+        loadAlertPreview();
+    }
+
+    // ===== RENDER BUSES =====
+    function renderBuses(route) {
+        const container = document.getElementById(`buses-${route}`);
+        const buses = [...BASE_BUSES[route], ...extraBuses[route]];
+        let html = '';
+
+        buses.forEach((bus, i) => {
+            const ov = overrides[route][i] || {};
+            const status = ov.status || 'running';
+            const disabledDays = ov.disabledDays || [];
+            const displayName = ov.replacedBy || bus[1];
+            const displayTime = ov.newTime || bus[0];
+            const period = ov.newPeriod || bus[2];
+            const isExtra = i >= BASE_BUSES[route].length;
+
+            let badgeClass = 'badge-running';
+            let badgeText = '✅ Running';
+            if (status === 'cancelled') { badgeClass = 'badge-cancelled'; badgeText = '❌ Cancelled'; }
+            if (status === 'replaced') { badgeClass = 'badge-replaced'; badgeText = '🔄 Replaced'; }
+            if (disabledDays.length > 0 && status === 'running') { badgeClass = 'badge-disabled'; badgeText = '📅 Day Off'; }
+
+            const replacedShow = status === 'replaced' ? 'show' : '';
+
+            html += `
+                <div class="bus-card ${status === 'cancelled' ? 'cancelled' : ''} ${status === 'replaced' ? 'replaced' : ''} ${disabledDays.length > 0 ? 'day-disabled' : ''}" id="card-${route}-${i}">
+                    <div class="bus-card-header" onclick="toggleCard('${route}', ${i})">
+                        <div class="bus-index">${i + 1}</div>
+                        <div class="bus-info">
+                            <div class="bus-name">${displayName} ${isExtra ? '🆕' : ''}</div>
+                            <div class="bus-time">${displayTime} ${period} ${ov.regNum || bus[3] ? '· ' + (ov.regNum || bus[3]) : '· No reg. number'}</div>
+                        </div>
+                        <span class="bus-status-badge ${badgeClass}">${badgeText}</span>
+                        <span class="expand-arrow" id="arrow-${route}-${i}">▼</span>
+                    </div>
+
+                    <div class="bus-card-body" id="body-${route}-${i}">
+
+                        <!-- STATUS -->
+                        <div class="control-row">
+                            <span class="control-label">Today's Status</span>
+                            <div class="status-selector">
+                                <button class="status-option ${status === 'running' ? 'active-running' : ''}" 
+                                    onclick="setStatus('${route}', ${i}, 'running')">✅ Running</button>
+                                <button class="status-option ${status === 'cancelled' ? 'active-cancelled' : ''}" 
+                                    onclick="setStatus('${route}', ${i}, 'cancelled')">❌ Cancel</button>
+                                <button class="status-option ${status === 'replaced' ? 'active-replaced' : ''}" 
+                                    onclick="setStatus('${route}', ${i}, 'replaced')">🔄 Replace</button>
+                            </div>
+                        </div>
+
+                        <!-- REPLACEMENT FIELDS -->
+                        <div class="replacement-fields ${replacedShow}" id="replace-fields-${route}-${i}">
+                            <input class="admin-input" id="replace-name-${route}-${i}" 
+                                placeholder="Replacement bus name (e.g. MEERAS)"
+                                value="${ov.replacedBy || ''}">
+                            <input class="admin-input" id="replace-time-${route}-${i}" 
+                                placeholder="New time (leave empty to keep same)"
+                                value="${ov.newTime || ''}">
+                        </div>
+
+                        <!-- EDIT NAME / TIME / REG NUMBER -->
+                        <div class="control-row">
+                            <span class="control-label">Edit Permanently</span>
+                            <div class="edit-row">
+                                <input class="admin-input" id="edit-name-${route}-${i}" 
+                                    placeholder="Bus name" value="${ov.permanentName || bus[1]}">
+                                <input class="admin-input" id="edit-time-${route}-${i}" 
+                                    placeholder="Time" value="${ov.permanentTime || bus[0]}">
+                            </div>
+                            <div class="edit-row" style="margin-top:8px;">
+                                <input class="admin-input" id="edit-reg-${route}-${i}" 
+                                    placeholder="Registration No. (e.g. KL-38-A-1234)"
+                                    value="${ov.regNum || bus[3] || ''}">
+                            </div>
+                        </div>
+
+                        <!-- DISABLED DAYS -->
+                        <div class="control-row">
+                            <span class="control-label">Does Not Run On</span>
+                            <div class="days-selector">
+                                ${DAYS.map((d, di) => `
+                                    <button class="day-chip ${disabledDays.includes(di) ? 'selected' : ''}" 
+                                        onclick="toggleDay('${route}', ${i}, ${di})" id="day-${route}-${i}-${di}">
+                                        ${d}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>`;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ===== CARD TOGGLE =====
+    function toggleCard(route, i) {
+        const body = document.getElementById(`body-${route}-${i}`);
+        const arrow = document.getElementById(`arrow-${route}-${i}`);
+        body.classList.toggle('open');
+        arrow.classList.toggle('open');
+    }
+
+    // ===== SET STATUS =====
+    function setStatus(route, i, status) {
+        if (!overrides[route][i]) overrides[route][i] = {};
+        overrides[route][i].status = status;
+
+        // Show/hide replacement fields
+        const fields = document.getElementById(`replace-fields-${route}-${i}`);
+        if (status === 'replaced') { fields.classList.add('show'); }
+        else { fields.classList.remove('show'); }
+
+        // Update button styles
+        ['running','cancelled','replaced'].forEach(s => {
+            const btn = document.querySelector(`#card-${route}-${i} .status-option.active-${s}`);
+            if (btn) btn.classList.remove(`active-${s}`);
+        });
+        event.target.classList.add(`active-${status}`);
+
+        // Update card border
+        const card = document.getElementById(`card-${route}-${i}`);
+        card.classList.remove('cancelled','replaced');
+        if (status === 'cancelled') card.classList.add('cancelled');
+        if (status === 'replaced') card.classList.add('replaced');
+    }
+
+    // ===== TOGGLE DAY =====
+    function toggleDay(route, i, dayIndex) {
+        if (!overrides[route][i]) overrides[route][i] = {};
+        if (!overrides[route][i].disabledDays) overrides[route][i].disabledDays = [];
+
+        const days = overrides[route][i].disabledDays;
+        const pos = days.indexOf(dayIndex);
+        if (pos === -1) { days.push(dayIndex); }
+        else { days.splice(pos, 1); }
+
+        const chip = document.getElementById(`day-${route}-${i}-${dayIndex}`);
+        chip.classList.toggle('selected');
+    }
+
+    // ===== ADD BUS =====
+    function addBus(route) {
+        const name = document.getElementById(`new-name-${route}`).value.trim().toUpperCase();
+        const time = document.getElementById(`new-time-${route}`).value.trim();
+        const period = document.getElementById(`new-period-${route}`).value;
+
+        if (!name || !time) { showToast('⚠️ Fill in bus name and time!'); return; }
+
+        extraBuses[route].push([time, name, period]);
+        document.getElementById(`new-name-${route}`).value = '';
+        document.getElementById(`new-time-${route}`).value = '';
+        renderBuses(route);
+        showToast(`✅ ${name} added! Remember to Save All.`);
+    }
+
+    // ===== SAVE ALL =====
+    async function saveAll(route) {
+        // Collect edits from input fields
+        const buses = [...BASE_BUSES[route], ...extraBuses[route]];
+        buses.forEach((bus, i) => {
+            const editName = document.getElementById(`edit-name-${route}-${i}`)?.value.trim();
+            const editTime = document.getElementById(`edit-time-${route}-${i}`)?.value.trim();
+            const editReg = document.getElementById(`edit-reg-${route}-${i}`)?.value.trim();
+            const replaceName = document.getElementById(`replace-name-${route}-${i}`)?.value.trim();
+            const replaceTime = document.getElementById(`replace-time-${route}-${i}`)?.value.trim();
+
+            if (!overrides[route][i]) overrides[route][i] = {};
+
+            // Save replacement info
+            if (replaceName) overrides[route][i].replacedBy = replaceName;
+            if (replaceTime) overrides[route][i].newTime = replaceTime;
+
+            // Save registration number
+            if (editReg !== undefined) overrides[route][i].regNum = editReg;
+
+            // Save permanent edits
+            if (editName && editName !== bus[1]) overrides[route][i].permanentName = editName;
+            if (editTime && editTime !== bus[0]) overrides[route][i].permanentTime = editTime;
+        });
+
+        const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+        const success = await firebaseSet('nammadebus', {
+            overrides_to: overrides.to,
+            overrides_from: overrides.from,
+            extra_to: extraBuses.to,
+            extra_from: extraBuses.from,
+            last_saved: now
+        });
+
+        if (success) {
+            showToast('✅ Saved to Firebase!');
+            document.getElementById('last-saved').textContent = 'Last saved: ' + now;
+            renderBuses(route);
+        }
+    }
+
+    // ===== TAB SWITCH =====
+    function switchTab(route, el) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById(`tab-${route}`).classList.add('active');
+        if (route === 'submissions') loadSubmissions();
+    }
+
+    // ===== SUBMISSIONS =====
+    let allSubmissions = {};
+
+    async function loadSubmissions() {
+        try {
+            const res = await firebaseGet('submissions');
+            allSubmissions = res || {};
+            renderSubmissions();
+        } catch(e) {
+            document.getElementById('submissions-list').innerHTML = '<div class="loading">Failed to load submissions.</div>';
+        }
+    }
+
+    function renderSubmissions() {
+        const container = document.getElementById('submissions-list');
+        const entries = Object.entries(allSubmissions);
+
+        // Count pending
+        const pending = entries.filter(([k, v]) => v.status === 'pending').length;
+        const countEl = document.getElementById('pending-count');
+        if (pending > 0) {
+            countEl.textContent = pending;
+            countEl.style.display = 'inline';
+        } else {
+            countEl.style.display = 'none';
+        }
+
+        document.getElementById('submissions-count').textContent =
+            `${entries.length} total · ${pending} pending review`;
+
+        if (entries.length === 0) {
+            container.innerHTML = '<div class="loading">No submissions yet! 😊</div>';
+            return;
+        }
+
+        // Sort — pending first
+        entries.sort((a, b) => {
+            if (a[1].status === 'pending' && b[1].status !== 'pending') return -1;
+            if (b[1].status === 'pending' && a[1].status !== 'pending') return 1;
+            return 0;
+        });
+
+        let html = '';
+        entries.forEach(([key, sub]) => {
+            const routeLabel = sub.route === 'to' ? '→ To Thodupuzha' : '← From Thodupuzha';
+            const statusBadge = sub.status === 'pending'
+                ? '<span style="background:rgba(255,152,0,0.2);color:#ff9800;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">⏳ Pending</span>'
+                : sub.status === 'approved'
+                ? '<span style="background:rgba(0,200,83,0.2);color:#00c853;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">✅ Approved</span>'
+                : '<span style="background:rgba(244,67,54,0.15);color:#f44336;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;">❌ Rejected</span>';
+
+            html += `
+                <div class="submission-card ${sub.status}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <div class="submission-reg">${sub.regNum}</div>
+                        ${statusBadge}
+                    </div>
+                    <div class="submission-bus">🚌 Bus #${sub.busIndex + 1}: ${sub.busName} · ${routeLabel}</div>
+                    <div class="submission-time">🕐 ${sub.submittedAt}</div>
+                    ${sub.status === 'pending' ? `
+                    <div class="submission-actions">
+                        <button class="approve-btn" onclick="approveSubmission('${key}', ${sub.busIndex}, '${sub.regNum}', '${sub.route}')">✅ Approve & Apply</button>
+                        <button class="reject-btn" onclick="rejectSubmission('${key}')">❌ Reject</button>
+                    </div>` : ''}
+                </div>`;
+        });
+
+        container.innerHTML = html;
+    }
+
+    async function approveSubmission(key, busIndex, regNum, route) {
+        // Apply reg number to overrides
+        if (!overrides[route][busIndex]) overrides[route][busIndex] = {};
+        overrides[route][busIndex].regNum = regNum;
+
+        // Update submission status
+        await firebaseSet(`submissions/${key}/status`, 'approved');
+
+        // Save overrides
+        const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        await firebaseSet('nammadebus', {
+            overrides_to: overrides.to,
+            overrides_from: overrides.from,
+            extra_to: extraBuses.to,
+            extra_from: extraBuses.from,
+            last_saved: now
+        });
+
+        showToast('✅ Approved! Reg number applied to bus card.');
+        loadSubmissions();
+        renderBuses(route);
+    }
+
+    async function rejectSubmission(key) {
+        await firebaseSet(`submissions/${key}/status`, 'rejected');
+        showToast('❌ Submission rejected.');
+        loadSubmissions();
+    }
+
+    // ===== TOAST =====
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+</script>
+</body>
+</html>
